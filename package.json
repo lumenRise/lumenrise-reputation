@@ -11,13 +11,14 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "check": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
     "check:model-parity": "node scripts/check-model-parity.mjs"
   },
   "dependencies": {
     "amqplib": "0.10.9",
-    "dotenv": "17.4.2",
     "mongoose": "9.10.1",
-    "@stellar/stellar-sdk": "17.1.0"
+    "@stellar/stellar-sdk": "17.1.0",
+    "envyra": "0.1.6"
   },
   "devDependencies": {
     "@types/amqplib": "0.10.8",
