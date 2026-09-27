@@ -10,13 +10,14 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "check": "tsc -p tsconfig.json --noEmit"
+    "check": "tsc -p tsconfig.json --noEmit",
+    "check:model-parity": "node scripts/check-model-parity.mjs"
   },
   "dependencies": {
-    "@stellar/stellar-sdk": "17.1.0",
     "amqplib": "0.10.9",
     "dotenv": "17.4.2",
-    "mongoose": "9.10.1"
+    "mongoose": "9.10.1",
+    "@stellar/stellar-sdk": "17.1.0"
   },
   "devDependencies": {
     "@types/amqplib": "0.10.8",
