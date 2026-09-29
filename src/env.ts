@@ -12,6 +12,12 @@ const schema = defineConfig({
   SYNC_WORKER_POLL_INTERVAL_MS: { type: 'number', default: 2_000 },
   GITHUB_CLIENT_ID: { default: '' },
   GITHUB_CLIENT_SECRET: { default: '', secret: true },
+  X_CLIENT_ID: { default: '' },
+  X_CLIENT_SECRET: { default: '', secret: true },
+  X_AUTO_SYNC_INTERVAL_HOURS: { type: 'number', default: 0 },
+  STELLAR_HORIZON_URL: { default: 'https://horizon-testnet.stellar.org' },
+  STELLAR_RPC_URL: { default: 'https://soroban-testnet.stellar.org' },
+  STELLAR_AUTH_NETWORK: { type: 'enum', values: ['testnet', 'public'], default: 'testnet' },
   CREDENTIAL_ENCRYPTION_KEY: { secret: true },
 });
 

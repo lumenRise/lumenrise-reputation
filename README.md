@@ -1,14 +1,22 @@
 # Lumenrise Reputation
 
-Private worker service for identity, provider evidence, scoring, policy evaluation, and Stellar scans. This repository has no public HTTP API. `lumenrise-api` remains the only client-facing entry point.
+Private worker service for provider evidence, reputation scoring, and Stellar activity scans. It has no public HTTP API; `lumenrise-api` handles all client requests, OAuth callbacks, sessions, and direct reads from MongoDB.
 
-## Current status
+## Runtime
 
-The runtime connects to the **same MongoDB database** used by `lumenrise-api` and to RabbitMQ. GitHub synchronization and its reputation calculation run here. The API creates the durable `IntegrationSyncJob` record and publishes `{ "jobId": "..." }` to the durable `lumenrise.reputation.github-sync.v1` queue. This worker claims only GitHub jobs; the API worker handles X. The worker also polls MongoDB for due GitHub jobs, so a missed RabbitMQ notification does not lose work.
+Both repositories connect to the same MongoDB database. The API records GitHub and X sync jobs in `IntegrationSyncJob` and Stellar scan jobs in `StellarActivityScan`. It sends a persistent `{ "jobId": "..." }` notification to the matching durable RabbitMQ queue:
+
+| Work | Queue |
+| --- | --- |
+| GitHub sync and developer score | `lumenrise.reputation.github-sync.v1` |
+| X sync and social score | `lumenrise.reputation.x-sync.v1` |
+| Stellar activity scan | `lumenrise.reputation.stellar-scan.v1` |
+
+Workers also poll MongoDB for due jobs, so a missed RabbitMQ notification does not lose work. Soroban evidence lookup polls its MongoDB queue. The X automatic sync scheduler runs here when `X_AUTO_SYNC_INTERVAL_HOURS` is greater than zero. API responses that can be computed from existing MongoDB data stay in the API.
 
 ## Local setup
 
-Use Node.js 24 or newer and a MongoDB replica set. Environment settings use `envyra`, as in `lumenrise-api`. Copy `.env.example` to `.env` and set `DB_URI`, `DB_NAME`, `RABBITMQ_URL`, and `CREDENTIAL_ENCRYPTION_KEY` to the exact values used by `lumenrise-api`. Set the GitHub OAuth client ID and secret used by the API so this worker can refresh expired GitHub tokens. Then run:
+Use Node.js 24 or newer, a MongoDB replica set, and RabbitMQ. Environment settings use `envyra`, as in the API. Copy `.env.example` to `.env` and set `DB_URI`, `DB_NAME`, `RABBITMQ_URL`, and `CREDENTIAL_ENCRYPTION_KEY` to the same values used by the API. Set the GitHub and X OAuth client credentials used by the API so workers can refresh provider tokens. Set the Stellar URLs and network to match the API. Then run:
 
 ```bash
 npm ci
@@ -16,15 +24,12 @@ npm run build
 npm run dev
 ```
 
-The worker starts consuming GitHub jobs after connecting to MongoDB and RabbitMQ. To stop it, send SIGINT or SIGTERM. `npm run check` verifies TypeScript without producing build output.
+SIGINT and SIGTERM stop the workers and close database and RabbitMQ connections. `npm run check` verifies TypeScript without producing build output.
 
-## Shared-data rule
+`npm test` runs worker and scoring tests. Set `LUMENRISE_TEST_DB_URI` to a disposable MongoDB replica set to include the transactional Stellar payment fact integration test; the suite creates and drops its own random database.
 
-The backend repositories use one MongoDB database and matching Mongoose model files. MongoDB stores shared data, while RabbitMQ carries worker commands. During this migration, the API still handles X synchronization and connection changes; Reputation handles GitHub synchronization. `npm run check:model-parity` compares every copied model and direct dependency with the sibling API repository (or `LUMENRISE_API_PATH`). This check is for development; the service builds and runs without the API checkout. Apply a model change to both repositories and pass the parity check before deployment.
+## Shared models
 
-## Next migration stages
+The repositories use matching Mongoose model files against one MongoDB database. Apply every model change to both repositories. `npm run check:model-parity` compares the copied model files and their direct dependencies with the API checkout (or `LUMENRISE_API_PATH`). This check is for development; Reputation builds and runs without an API checkout.
 
-1. Move the remaining X, Stellar, remaining scoring, and policy workers.
-2. Move identity operations while keeping public routes and session issuance in the API.
-
-The launch service is outside these stages.
+The token launch service is a later stage.

@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 
 import env from './env.js';
 import { startGitHubSyncWorker } from './workers/githubSync.js';
+import { startXSyncWorker } from './workers/xSync.js';
+import { startStellarScanWorker } from './workers/stellarScan.js';
+import { startSorobanEvidenceWorker } from './workers/sorobanEvidence.js';
+import { startXScheduler } from './workers/xScheduler.js';
 
 const main = async (): Promise<void> => {
   mongoose.set('autoIndex', false);
@@ -21,16 +25,21 @@ const main = async (): Promise<void> => {
     throw error;
   }
 
-  let worker;
+  const workers: Array<{ stop: () => Promise<void> }> = [];
   try {
-    worker = await startGitHubSyncWorker(broker, env.SYNC_WORKER_POLL_INTERVAL_MS);
+    workers.push(await startGitHubSyncWorker(broker, env.SYNC_WORKER_POLL_INTERVAL_MS));
+    workers.push(await startXSyncWorker(broker, env.SYNC_WORKER_POLL_INTERVAL_MS));
+    workers.push(await startStellarScanWorker(broker, env.SYNC_WORKER_POLL_INTERVAL_MS));
+    workers.push(startSorobanEvidenceWorker(env.SYNC_WORKER_POLL_INTERVAL_MS));
+    workers.push(startXScheduler());
   } catch (error) {
+    await Promise.allSettled(workers.reverse().map((worker) => worker.stop()));
     await broker.close();
     await mongoose.disconnect();
     throw error;
   }
 
-  console.info('Reputation service started GitHub sync worker.');
+  console.info('Reputation service started GitHub, X, Stellar and Soroban workers.');
 
   let closing = false;
   const shutdown = async (): Promise<void> => {
@@ -38,7 +47,7 @@ const main = async (): Promise<void> => {
     closing = true;
 
     try {
-      await worker.stop();
+      await Promise.all(workers.reverse().map((worker) => worker.stop()));
       await broker.close();
       await mongoose.disconnect();
     } catch (error) {
