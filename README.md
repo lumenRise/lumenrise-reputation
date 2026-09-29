@@ -4,11 +4,11 @@ Private worker service for identity, provider evidence, scoring, policy evaluati
 
 ## Current status
 
-The runtime connects to the **same MongoDB database** used by `lumenrise-api` and to RabbitMQ. The Reputation-owned Mongoose model files and their direct type/constant dependencies now live here as exact copies of the API files. No message consumers, business logic, migrations, or collection writes have been moved yet. The existing API continues to run its workers until later migration stages.
+The runtime connects to the **same MongoDB database** used by `lumenrise-api` and to RabbitMQ. GitHub synchronization and its reputation calculation run here. The API creates the durable `IntegrationSyncJob` record and publishes `{ "jobId": "..." }` to the durable `lumenrise.reputation.github-sync.v1` queue. This worker claims only GitHub jobs; the API worker handles X. The worker also polls MongoDB for due GitHub jobs, so a missed RabbitMQ notification does not lose work.
 
 ## Local setup
 
-Use Node.js 24 or newer and a MongoDB replica set. Copy `.env.example` to `.env` and set `DB_URI` and `DB_NAME` to the exact values used by `lumenrise-api`. Set `RABBITMQ_URL` to the broker address. Then run:
+Use Node.js 24 or newer and a MongoDB replica set. Environment settings use `envyra`, as in `lumenrise-api`. Copy `.env.example` to `.env` and set `DB_URI`, `DB_NAME`, `RABBITMQ_URL`, and `CREDENTIAL_ENCRYPTION_KEY` to the exact values used by `lumenrise-api`. Set the GitHub OAuth client ID and secret used by the API so this worker can refresh expired GitHub tokens. Then run:
 
 ```bash
 npm ci
@@ -16,16 +16,15 @@ npm run build
 npm run dev
 ```
 
-The worker will report that both connections are ready. It does not process jobs yet. To stop it, send SIGINT or SIGTERM. `npm run check` verifies TypeScript without producing build output.
+The worker starts consuming GitHub jobs after connecting to MongoDB and RabbitMQ. To stop it, send SIGINT or SIGTERM. `npm run check` verifies TypeScript without producing build output.
 
 ## Shared-data rule
 
-The three backend repositories will use one MongoDB database. A collection has one owning service for writes and migrations; other services may read it using matching schema files. MongoDB stores shared data, while RabbitMQ carries commands and domain events. Only the models that Reputation will own are copied here. The API retains its current files while routes and workers are migrated. `npm run check:model-parity` compares every copied model and direct dependency with the sibling API repository (or `LUMENRISE_API_PATH`). This check is for development; the service builds and runs without the API checkout. A model change must be applied to both repositories and pass the parity check before deployment.
+The backend repositories use one MongoDB database and matching Mongoose model files. MongoDB stores shared data, while RabbitMQ carries worker commands. During this migration, the API still handles X synchronization and connection changes; Reputation handles GitHub synchronization. `npm run check:model-parity` compares every copied model and direct dependency with the sibling API repository (or `LUMENRISE_API_PATH`). This check is for development; the service builds and runs without the API checkout. Apply a model change to both repositories and pass the parity check before deployment.
 
 ## Next migration stages
 
-1. Define the RabbitMQ message contract and move one integration sync worker end to end while preserving API job status behavior.
-2. Move the remaining provider, Stellar, scoring, and policy workers.
-3. Move identity operations while keeping public routes and session issuance in the API.
+1. Move the remaining X, Stellar, remaining scoring, and policy workers.
+2. Move identity operations while keeping public routes and session issuance in the API.
 
 The launch service is outside these stages.
