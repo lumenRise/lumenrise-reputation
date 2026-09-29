@@ -20,20 +20,4 @@ const source =
 
 const env = createEnv(schema, { source });
 
-if (!/^mongodb(?:\+srv)?:\/\//.test(env.DB_URI)) {
-  throw new Error('DB_URI must be a MongoDB connection string');
-}
-
-if (!/^amqps?:\/\//.test(env.RABBITMQ_URL)) {
-  throw new Error('RABBITMQ_URL must be an AMQP connection string');
-}
-
-if (!/^[a-f\d]{64}$/i.test(env.CREDENTIAL_ENCRYPTION_KEY)) {
-  throw new Error('CREDENTIAL_ENCRYPTION_KEY must be a 64-character hexadecimal key');
-}
-
-if (!Number.isInteger(env.SYNC_WORKER_POLL_INTERVAL_MS) || env.SYNC_WORKER_POLL_INTERVAL_MS < 100) {
-  throw new Error('SYNC_WORKER_POLL_INTERVAL_MS must be an integer of at least 100');
-}
-
 export default env;
