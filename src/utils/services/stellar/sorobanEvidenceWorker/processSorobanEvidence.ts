@@ -1,10 +1,10 @@
 import { Networks, rpc, StrKey } from '@stellar/stellar-sdk';
 
-import env from '../../../../env.js';
-import claimSorobanEvidence from './claimSorobanEvidence.js';
-import type { SorobanEventEvidence } from '../../../../types/stellar/soroban.js';
-import SorobanTransactionEvidence from '../../../../models/SorobanTransactionEvidence.js';
-
+import env from '../../../../env';
+import logEvent from '../../../../logEvent';
+import claimSorobanEvidence from './claimSorobanEvidence';
+import type { SorobanEventEvidence } from '../../../../types/stellar/soroban';
+import SorobanTransactionEvidence from '../../../../models/SorobanTransactionEvidence';
 const MAX_ATTEMPTS = 3;
 
 const processSorobanEvidence = async (): Promise<void> => {
@@ -76,7 +76,12 @@ const processSorobanEvidence = async (): Promise<void> => {
       { runValidators: true },
     );
   } catch {
-    console.warn('Soroban evidence lookup failed', { transactionHash: evidence.transactionHash });
+    logEvent('warn', 'soroban_evidence_failed', {
+      evidenceId: evidence._id.toString(),
+      scanId: evidence.scan.toString(),
+      attempts: evidence.attempts,
+      maxAttempts: MAX_ATTEMPTS,
+    });
     await SorobanTransactionEvidence.updateOne(
       { _id: evidence._id, rpcStatus: 'running', leaseUntil: evidence.leaseUntil },
       {

@@ -1,4 +1,4 @@
-import type { GitHubContributionPeriodRecord } from '../../../../types/reputation/github.js';
+import type { GitHubContributionPeriodRecord } from '../../../../types/reputation/github';
 
 const sumYearlyContribution = (
   periods: GitHubContributionPeriodRecord[],

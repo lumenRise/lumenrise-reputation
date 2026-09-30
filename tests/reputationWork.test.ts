@@ -1,11 +1,10 @@
-import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import assert from 'node:assert/strict';
 
-import { calculateDeveloperScore } from '../src/utils/services/reputation/developerScore/calculateDeveloperScore.js';
-import { normalizeDiminishingReturns } from '../src/utils/services/reputation/developerScore/normalizeDiminishingReturns.js';
-import { mergeStellarActivityPage, createEmptyStellarActivityAggregate } from '../src/services/stellar/mergeActivityPage.js';
-import { calculateSocialScore } from '../src/utils/services/reputation/socialScore/calculateSocialScore.js';
-
+import { calculateSocialScore } from '../src/utils/services/reputation/socialScore/calculateSocialScore';
+import { calculateDeveloperScore } from '../src/utils/services/reputation/developerScore/calculateDeveloperScore';
+import { normalizeDiminishingReturns } from '../src/utils/services/reputation/developerScore/normalizeDiminishingReturns';
+import { mergeStellarActivityPage, createEmptyStellarActivityAggregate } from '../src/services/stellar/mergeActivityPage';
 test('developer score normalizes available weights and caps growth', () => {
   const observedAt = new Date('2026-09-23T12:00:00Z');
   const result = calculateDeveloperScore([

@@ -1,10 +1,9 @@
-import { round } from './round.js';
-import { normalizeSocialSignal } from './normalizeSocialSignal.js';
+import { round } from './round';
+import { normalizeSocialSignal } from './normalizeSocialSignal';
 import type {
   SocialScoreCalculation,
   SocialSignalInput,
-} from '../../../../types/reputation/socialScoring.js';
-
+} from '../../../../types/reputation/socialScoring';
 const calculateSocialScore = (inputs: SocialSignalInput[]): SocialScoreCalculation => {
   if (inputs.some((input) => !Number.isFinite(input.baseWeight) || input.baseWeight <= 0)) {
     throw new Error('Social signal weights must be positive');

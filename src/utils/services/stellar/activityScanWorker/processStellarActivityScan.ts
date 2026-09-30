@@ -1,9 +1,10 @@
-import type { StellarActivityScanDocument } from '../../../../types/stellar/scan.js';
-import { failStellarActivityScan } from '../../../../services/stellar/activityScanQueue.js';
-import { mergeStellarActivityPage } from '../../../../services/stellar/mergeActivityPage.js';
-import getStellarAccountOperations from '../../../../services/stellar/getAccountOperations.js';
-import persistStellarPaymentPage from '../../../../services/sybil/persistStellarPaymentPage.js';
-import getSorobanEvidenceForPage from '../../../../services/stellar/getSorobanEvidenceForPage.js';
+import logEvent from '../../../../logEvent';
+import type { StellarActivityScanDocument } from '../../../../types/stellar/scan';
+import { failStellarActivityScan } from '../../../../services/stellar/activityScanQueue';
+import { mergeStellarActivityPage } from '../../../../services/stellar/mergeActivityPage';
+import getStellarAccountOperations from '../../../../services/stellar/getAccountOperations';
+import persistStellarPaymentPage from '../../../../services/sybil/persistStellarPaymentPage';
+import getSorobanEvidenceForPage from '../../../../services/stellar/getSorobanEvidenceForPage';
 
 const processStellarActivityScan = async (scan: StellarActivityScanDocument): Promise<void> => {
   try {
@@ -32,10 +33,15 @@ const processStellarActivityScan = async (scan: StellarActivityScanDocument): Pr
 
     await persistStellarPaymentPage(scan, page, merged, now, sorobanEvidence);
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown Stellar scan error';
+    const message = error instanceof Error ? error.name : 'UnknownError';
 
     await failStellarActivityScan(scan, message, true);
-    console.warn('Stellar activity scan page failed', { error, scanId: scan._id });
+    logEvent('warn', 'stellar_scan_page_failed', {
+      scanId: scan._id.toString(),
+      identityId: scan.identity.toString(),
+      attempts: scan.consecutiveFailures + 1,
+      errorName: error instanceof Error ? error.name : 'UnknownError',
+    });
   }
 };
 

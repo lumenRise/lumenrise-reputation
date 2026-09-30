@@ -1,12 +1,11 @@
 import { Types } from 'mongoose';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { XPost } from '../../src/types/reputation/x.js';
-import type { XUser } from '../../src/types/integration/x.js';
-import XDataSnapshot from '../../src/models/XDataSnapshot.js';
-import XRateLimitError from '../../src/services/integration/xRateLimit.js';
-import { buildXMetrics, collectXData, collectXPosts } from '../../src/services/reputation/xData.js';
-
+import type { XPost } from '../../src/types/reputation/x';
+import type { XUser } from '../../src/types/integration/x';
+import XDataSnapshot from '../../src/models/XDataSnapshot';
+import XRateLimitError from '../../src/services/integration/xRateLimit';
+import { buildXMetrics, collectXData, collectXPosts } from '../../src/services/reputation/xData';
 const user: XUser = {
   id: '42',
   name: 'Developer',

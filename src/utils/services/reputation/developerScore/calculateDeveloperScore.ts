@@ -1,11 +1,10 @@
-import { round } from './round.js';
-import { normalizeDiminishingReturns } from './normalizeDiminishingReturns.js';
+import { round } from './round';
+import { normalizeDiminishingReturns } from './normalizeDiminishingReturns';
 import type {
   DeveloperReputationCalculation,
   DeveloperReputationStatus,
   DeveloperSignalInput,
-} from '../../../../types/reputation/scoring.js';
-
+} from '../../../../types/reputation/scoring';
 const calculateDeveloperScore = (
   inputs: DeveloperSignalInput[],
   status: DeveloperReputationStatus,

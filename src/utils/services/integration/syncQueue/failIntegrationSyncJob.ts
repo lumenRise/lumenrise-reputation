@@ -1,7 +1,6 @@
-import { calculateSyncRetryDelay } from './calculateSyncRetryDelay.js';
-import IntegrationSyncJob from '../../../../models/IntegrationSyncJob.js';
-import type { IntegrationSyncJobDocument } from '../../../../types/integration/sync.js';
-
+import { calculateSyncRetryDelay } from './calculateSyncRetryDelay';
+import IntegrationSyncJob from '../../../../models/IntegrationSyncJob';
+import type { IntegrationSyncJobDocument } from '../../../../types/integration/sync';
 const failIntegrationSyncJob = async (
   job: IntegrationSyncJobDocument,
   error: string,

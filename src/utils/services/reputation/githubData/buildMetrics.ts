@@ -1,12 +1,11 @@
-import { sumYearlyContribution } from './sumYearlyContribution.js';
-import type { GitHubUser } from '../../../../types/integration/github.js';
-import { MILLISECONDS_PER_DAY } from '../../../../constants/services/reputation/githubData.js';
+import { sumYearlyContribution } from './sumYearlyContribution';
+import type { GitHubUser } from '../../../../types/integration/github';
+import { MILLISECONDS_PER_DAY } from '../../../../constants/services/reputation/githubData';
 import type {
   GitHubContributionPeriodRecord,
   GitHubDataMetrics,
   GitHubRepositoryNode,
-} from '../../../../types/reputation/github.js';
-
+} from '../../../../types/reputation/github';
 const buildMetrics = (
   user: GitHubUser,
   repositories: GitHubRepositoryNode[],

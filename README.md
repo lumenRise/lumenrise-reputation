@@ -12,7 +12,7 @@ Both repositories connect to the same MongoDB database. The API records GitHub a
 | X sync and social score | `lumenrise.reputation.x-sync.v1` |
 | Stellar activity scan | `lumenrise.reputation.stellar-scan.v1` |
 
-Workers also poll MongoDB for due jobs, so a missed RabbitMQ notification does not lose work. Soroban evidence lookup polls its MongoDB queue. The X automatic sync scheduler runs here when `X_AUTO_SYNC_INTERVAL_HOURS` is greater than zero. API responses that can be computed from existing MongoDB data stay in the API.
+Workers also poll MongoDB for due jobs, so a missed RabbitMQ notification does not lose work. Soroban evidence lookup polls its MongoDB queue. GitHub and X refresh only on manual request; `X_AUTO_SYNC_INTERVAL_HOURS` must be zero. API responses that can be computed from existing MongoDB data stay in the API.
 
 ## Local setup
 
@@ -26,7 +26,7 @@ npm run dev
 
 SIGINT and SIGTERM stop the workers and close database and RabbitMQ connections. `npm run check` verifies TypeScript without producing build output.
 
-`npm test` runs worker and scoring tests. Set `LUMENRISE_TEST_DB_URI` to a disposable MongoDB replica set to include the transactional Stellar payment fact integration test; the suite creates and drops its own random database.
+`npm test` runs worker and scoring tests. Set `LUMENRISE_TEST_DB_URI` to a disposable MongoDB replica set to include transactional integration tests; the suite creates and drops its own random databases. With Docker Compose available, `scripts/test-with-services.sh` starts isolated MongoDB and RabbitMQ and runs both repositories' checks. See [operations](docs/operations.md) for deployment, refresh, retention, and recovery behavior.
 
 ## Shared models
 

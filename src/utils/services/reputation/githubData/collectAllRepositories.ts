@@ -1,9 +1,8 @@
-import { postGitHubGraphQL } from './postGitHubGraphQL.js';
+import { postGitHubGraphQL } from './postGitHubGraphQL';
 import type {
   GitHubRepositoriesQueryData,
   GitHubRepositoryNode,
-} from '../../../../types/reputation/github.js';
-
+} from '../../../../types/reputation/github';
 const collectAllRepositories = async (
   username: string,
   accessToken: string,

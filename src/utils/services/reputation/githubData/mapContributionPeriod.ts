@@ -2,7 +2,7 @@ import type {
   GitHubContributionCollectionResponse,
   GitHubContributionPeriodRecord,
   GitHubContributionRange,
-} from '../../../../types/reputation/github.js';
+} from '../../../../types/reputation/github';
 
 const mapContributionPeriod = (
   range: GitHubContributionRange,

@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import createPage from '../utils/stellarActivityScan/createPage.js';
-import createOperation from '../utils/stellarActivityScan/createOperation.js';
+import createPage from '../utils/stellarActivityScan/createPage';
+import createOperation from '../utils/stellarActivityScan/createOperation';
 import {
   createEmptyStellarActivityAggregate,
   mergeStellarActivityPage,
-} from '../../src/services/stellar/mergeActivityPage.js';
-
+} from '../../src/services/stellar/mergeActivityPage';
 describe('Stellar activity scan aggregation', () => {
   it('deduplicates transaction and UTC day at a page boundary', () => {
     const first = createPage(

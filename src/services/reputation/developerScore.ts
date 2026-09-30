@@ -1,33 +1,30 @@
-import type { Types } from 'mongoose';
-
-import ExternalAccount from '../../models/ExternalAccount.js';
-import ReputationSnapshot from '../../models/ReputationSnapshot.js';
-import GitHubDataSnapshot from '../../models/GitHubDataSnapshot.js';
-import type { ReputationSnapshotDocument } from '../../types/reputation/model.js';
-import { createGitHubSignals } from '../../utils/services/reputation/developerScore/createGitHubSignals.js';
+import ExternalAccount from '../../models/ExternalAccount';
+import ReputationSnapshot from '../../models/ReputationSnapshot';
+import type { ReputationSnapshotDocument } from '../../types/reputation/model';
+import type { GitHubDataSnapshotDocument } from '../../types/reputation/github';
+import { createGitHubSignals } from '../../utils/services/reputation/developerScore/createGitHubSignals';
 import type {
   DeveloperReputationSourceInput,
   DeveloperSignalInput,
-} from '../../types/reputation/scoring.js';
-import { calculateDeveloperScore } from '../../utils/services/reputation/developerScore/calculateDeveloperScore.js';
-import { normalizeDiminishingReturns } from '../../utils/services/reputation/developerScore/normalizeDiminishingReturns.js';
-
+} from '../../types/reputation/scoring';
+import { calculateDeveloperScore } from '../../utils/services/reputation/developerScore/calculateDeveloperScore';
+import { normalizeDiminishingReturns } from '../../utils/services/reputation/developerScore/normalizeDiminishingReturns';
 const DEVELOPER_ALGORITHM_VERSION = 'developer-v2';
 
 const calculateAndStoreDeveloperReputation = async (
-  identityId: Types.ObjectId,
+  githubSnapshot: GitHubDataSnapshotDocument,
   calculatedAt = new Date(),
-): Promise<ReputationSnapshotDocument> => {
-  const accounts = await ExternalAccount.find({
-    identity: identityId,
+): Promise<ReputationSnapshotDocument | null> => {
+  const accountFilter = {
+    _id: githubSnapshot.externalAccount,
+    identity: githubSnapshot.identity,
     provider: 'github',
+    providerAccountId: githubSnapshot.providerAccountId,
     status: 'connected',
-  });
-
-  const githubAccount = accounts.find((account) => account.provider === 'github');
-  const githubSnapshot = githubAccount
-    ? await GitHubDataSnapshot.findOne({ externalAccount: githubAccount._id }).sort({ collectedAt: -1 })
-    : null;
+  } as const;
+  if (!(await ExternalAccount.exists(accountFilter))) {
+    return null;
+  }
 
   const inputs: DeveloperSignalInput[] = [];
   const sources: DeveloperReputationSourceInput[] = [];
@@ -43,28 +40,12 @@ const calculateAndStoreDeveloperReputation = async (
     });
   }
 
-  if (sources.length === 0) {
-    return ReputationSnapshot.create({
-      identity: identityId,
-      category: 'developer',
-      status: 'failed',
-      algorithmVersion: DEVELOPER_ALGORITHM_VERSION,
-      score: null,
-      signals: [],
-      sources: [],
-      calculatedAt,
-    });
-  }
-
-  const status =
-    sources.length === accounts.length && sources.every((source) => source.status === 'complete')
-      ? 'complete'
-      : 'partial';
+  const status = sources.every((source) => source.status === 'complete') ? 'complete' : 'partial';
 
   const calculation = calculateDeveloperScore(inputs, status);
 
-  return ReputationSnapshot.create({
-    identity: identityId,
+  const reputation = await ReputationSnapshot.create({
+    identity: githubSnapshot.identity,
     category: 'developer',
     status: calculation.status,
     algorithmVersion: DEVELOPER_ALGORITHM_VERSION,
@@ -78,6 +59,11 @@ const calculateAndStoreDeveloperReputation = async (
     })),
     calculatedAt,
   });
+  if (!(await ExternalAccount.exists(accountFilter))) {
+    await ReputationSnapshot.deleteOne({ _id: reputation._id });
+    return null;
+  }
+  return reputation;
 };
 
 export {

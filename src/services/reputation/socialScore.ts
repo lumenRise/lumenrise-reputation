@@ -1,11 +1,10 @@
-import ExternalAccount from '../../models/ExternalAccount.js';
-import ReputationSnapshot from '../../models/ReputationSnapshot.js';
-import type { XDataSnapshotDocument } from '../../types/reputation/x.js';
-import type { ReputationSnapshotDocument } from '../../types/reputation/model.js';
-import { calculateSocialScore } from '../../utils/services/reputation/socialScore/calculateSocialScore.js';
-import { createXSocialSignals } from '../../utils/services/reputation/socialScore/createXSocialSignals.js';
-import { normalizeSocialSignal } from '../../utils/services/reputation/socialScore/normalizeSocialSignal.js';
-
+import ExternalAccount from '../../models/ExternalAccount';
+import ReputationSnapshot from '../../models/ReputationSnapshot';
+import type { XDataSnapshotDocument } from '../../types/reputation/x';
+import type { ReputationSnapshotDocument } from '../../types/reputation/model';
+import { calculateSocialScore } from '../../utils/services/reputation/socialScore/calculateSocialScore';
+import { createXSocialSignals } from '../../utils/services/reputation/socialScore/createXSocialSignals';
+import { normalizeSocialSignal } from '../../utils/services/reputation/socialScore/normalizeSocialSignal';
 const SOCIAL_ALGORITHM_VERSION = 'social-v1';
 
 const calculateAndStoreSocialReputation = async (
@@ -16,6 +15,7 @@ const calculateAndStoreSocialReputation = async (
     _id: snapshot.externalAccount,
     identity: snapshot.identity,
     provider: 'x',
+    providerAccountId: snapshot.providerAccountId,
     status: 'connected',
   }).select('_id');
 
@@ -45,6 +45,9 @@ const calculateAndStoreSocialReputation = async (
 
   const stillConnected = await ExternalAccount.exists({
     _id: account._id,
+    identity: snapshot.identity,
+    provider: 'x',
+    providerAccountId: snapshot.providerAccountId,
     status: 'connected',
   });
 

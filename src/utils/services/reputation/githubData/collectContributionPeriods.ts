@@ -1,11 +1,10 @@
-import { postGitHubGraphQL } from './postGitHubGraphQL.js';
-import { mapContributionPeriod } from './mapContributionPeriod.js';
+import { postGitHubGraphQL } from './postGitHubGraphQL';
+import { mapContributionPeriod } from './mapContributionPeriod';
 import type {
   GitHubContributionPeriodRecord,
   GitHubContributionRange,
   GitHubContributionsQueryData,
-} from '../../../../types/reputation/github.js';
-
+} from '../../../../types/reputation/github';
 const collectContributionPeriods = async (
   username: string,
   accessToken: string,

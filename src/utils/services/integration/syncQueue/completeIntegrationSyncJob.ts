@@ -1,8 +1,7 @@
 import type { Types } from 'mongoose';
 
-import IntegrationSyncJob from '../../../../models/IntegrationSyncJob.js';
-import type { IntegrationSyncJobDocument } from '../../../../types/integration/sync.js';
-
+import IntegrationSyncJob from '../../../../models/IntegrationSyncJob';
+import type { IntegrationSyncJobDocument } from '../../../../types/integration/sync';
 const completeIntegrationSyncJob = async (
   job: IntegrationSyncJobDocument,
   snapshotId: Types.ObjectId,

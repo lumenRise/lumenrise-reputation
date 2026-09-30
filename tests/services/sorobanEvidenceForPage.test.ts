@@ -1,11 +1,10 @@
 import { Types } from 'mongoose';
 import { describe, expect, it } from 'vitest';
 
-import createPage from '../utils/stellarActivityScan/createPage.js';
-import createOperation from '../utils/stellarActivityScan/createOperation.js';
-import type { StellarActivityScanDocument } from '../../src/types/stellar/scan.js';
-import getSorobanEvidenceForPage from '../../src/services/stellar/getSorobanEvidenceForPage.js';
-
+import createPage from '../utils/stellarActivityScan/createPage';
+import createOperation from '../utils/stellarActivityScan/createOperation';
+import type { StellarActivityScanDocument } from '../../src/types/stellar/scan';
+import getSorobanEvidenceForPage from '../../src/services/stellar/getSorobanEvidenceForPage';
 const address = 'GCFIRY65OQE7DFP5KLNS2PF2LVZMUZYJX4OZIEQ36N2IQANUB5XVYOJR';
 
 describe('Soroban evidence candidates', () => {

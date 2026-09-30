@@ -1,8 +1,7 @@
-import { getXTimelineUrl } from './getXTimelineUrl.js';
-import XRateLimitError from '../../../../services/integration/xRateLimit.js';
-import type { XPost, XTimelineResponse } from '../../../../types/reputation/x.js';
-import XApiResponseError from '../../../../services/integration/xApiResponseError.js';
-
+import { getXTimelineUrl } from './getXTimelineUrl';
+import XRateLimitError from '../../../../services/integration/xRateLimit';
+import type { XPost, XTimelineResponse } from '../../../../types/reputation/x';
+import XApiResponseError from '../../../../services/integration/xApiResponseError';
 const collectXPosts = async (userId: string, accessToken: string): Promise<XPost[]> => {
   const posts: XPost[] = [];
   const observedPaginationTokens = new Set<string>();

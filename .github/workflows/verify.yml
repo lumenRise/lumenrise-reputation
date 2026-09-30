@@ -1,0 +1,29 @@
+name: Verify Reputation and API
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  integrated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: reputation
+      - uses: actions/checkout@v4
+        with:
+          repository: poconik/lumenrise-api
+          token: ${{ secrets.MODEL_PARITY_READ_TOKEN }}
+          path: api
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci
+        working-directory: reputation
+      - run: npm ci
+        working-directory: api
+      - run: ./scripts/test-with-services.sh
+        working-directory: reputation
+        env:
+          LUMENRISE_API_PATH: ${{ github.workspace }}/api

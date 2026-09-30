@@ -1,12 +1,11 @@
 import type { Types } from 'mongoose';
 
-import { refreshXAccessToken } from '../../oauth/x/refreshXAccessToken.js';
-import { needsCredentialRefresh } from '../githubSync/needsCredentialRefresh.js';
+import { refreshXAccessToken } from '../../oauth/x/refreshXAccessToken';
+import { needsCredentialRefresh } from '../githubSync/needsCredentialRefresh';
 import {
   getProviderCredential,
   storeProviderCredential,
-} from '../../../../services/integration/providerCredential.js';
-
+} from '../../../../services/integration/providerCredential';
 const resolveXAccessToken = async (externalAccountId: Types.ObjectId): Promise<string | null> => {
   const credential = await getProviderCredential(externalAccountId);
 

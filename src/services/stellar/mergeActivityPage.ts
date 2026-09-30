@@ -1,10 +1,9 @@
-import type { StellarOperationsResult } from '../../types/stellar/operations.js';
+import type { StellarOperationsResult } from '../../types/stellar/operations';
 import type {
   StellarActivityAggregate,
   StellarActivityMergeResult,
-} from '../../types/stellar/scan.js';
-import { createEmptyStellarActivityAggregate } from '../../utils/services/stellar/mergeActivityPage/createEmptyStellarActivityAggregate.js';
-
+} from '../../types/stellar/scan';
+import { createEmptyStellarActivityAggregate } from '../../utils/services/stellar/mergeActivityPage/createEmptyStellarActivityAggregate';
 const mergeStellarActivityPage = (
   current: StellarActivityAggregate,
   page: StellarOperationsResult,

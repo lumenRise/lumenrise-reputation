@@ -1,16 +1,15 @@
 import { Types } from 'mongoose';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { StellarActivityScanDocument } from '../../src/types/stellar/scan.js';
-import type { StellarOperationsResult } from '../../src/types/stellar/operations.js';
-import { failStellarActivityScan } from '../../src/services/stellar/activityScanQueue.js';
-import getStellarAccountOperations from '../../src/services/stellar/getAccountOperations.js';
-import persistStellarPaymentPage from '../../src/services/sybil/persistStellarPaymentPage.js';
-import { processStellarActivityScan } from '../../src/utils/services/stellar/activityScanWorker/processStellarActivityScan.js';
-
-vi.mock('../../src/services/stellar/getAccountOperations.js', () => ({ default: vi.fn() }));
-vi.mock('../../src/services/sybil/persistStellarPaymentPage.js', () => ({ default: vi.fn() }));
-vi.mock('../../src/services/stellar/activityScanQueue.js', () => ({
+import type { StellarActivityScanDocument } from '../../src/types/stellar/scan';
+import type { StellarOperationsResult } from '../../src/types/stellar/operations';
+import { failStellarActivityScan } from '../../src/services/stellar/activityScanQueue';
+import getStellarAccountOperations from '../../src/services/stellar/getAccountOperations';
+import persistStellarPaymentPage from '../../src/services/sybil/persistStellarPaymentPage';
+import { processStellarActivityScan } from '../../src/utils/services/stellar/activityScanWorker/processStellarActivityScan';
+vi.mock('../../src/services/stellar/getAccountOperations', () => ({ default: vi.fn() }));
+vi.mock('../../src/services/sybil/persistStellarPaymentPage', () => ({ default: vi.fn() }));
+vi.mock('../../src/services/stellar/activityScanQueue', () => ({
   failStellarActivityScan: vi.fn(),
 }));
 
@@ -18,6 +17,7 @@ const address = 'GCFIRY65OQE7DFP5KLNS2PF2LVZMUZYJX4OZIEQ36N2IQANUB5XVYOJR';
 const createScan = (): StellarActivityScanDocument =>
   ({
     _id: new Types.ObjectId(),
+    identity: new Types.ObjectId(),
     address,
     cursor: '100',
     sourceUrl: 'https://horizon-testnet.stellar.org',
@@ -120,6 +120,6 @@ describe('Stellar activity scan worker', () => {
     await processStellarActivityScan(scan);
 
     expect(persistStellarPaymentPage).not.toHaveBeenCalled();
-    expect(failStellarActivityScan).toHaveBeenCalledWith(scan, 'Horizon unavailable', true);
+    expect(failStellarActivityScan).toHaveBeenCalledWith(scan, 'Error', true);
   });
 });

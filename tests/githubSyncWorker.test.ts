@@ -1,16 +1,14 @@
-import assert from 'node:assert/strict';
 import test from 'node:test';
-
 import { Types } from 'mongoose';
-
+import assert from 'node:assert/strict';
 process.env.NODE_ENV = 'test';
 process.env.DB_URI = 'mongodb://127.0.0.1:27017';
 process.env.DB_NAME = 'lumenrise_test';
 process.env.RABBITMQ_URL = 'amqp://127.0.0.1:5672';
 process.env.CREDENTIAL_ENCRYPTION_KEY = '0'.repeat(64);
 
-const IntegrationSyncJob = (await import('../src/models/IntegrationSyncJob.js')).default;
-const { claimGitHubSyncJob, parseJobId } = await import('../src/workers/githubSync.js');
+const IntegrationSyncJob = (await import('../src/models/IntegrationSyncJob')).default;
+const { claimGitHubSyncJob, parseJobId } = await import('../src/workers/githubSync');
 
 test('worker accepts only valid GitHub job IDs from RabbitMQ', () => {
   const id = new Types.ObjectId().toString();
@@ -23,6 +21,8 @@ test('worker accepts only valid GitHub job IDs from RabbitMQ', () => {
 
 test('worker claims GitHub jobs only', async () => {
   const original = IntegrationSyncJob.findOneAndUpdate;
+  const originalUpdateMany = IntegrationSyncJob.updateMany;
+  IntegrationSyncJob.updateMany = (() => Promise.resolve({ modifiedCount: 0 })) as typeof originalUpdateMany;
   let filter: unknown;
   IntegrationSyncJob.findOneAndUpdate = ((received: unknown) => {
     filter = received;
@@ -34,5 +34,6 @@ test('worker claims GitHub jobs only', async () => {
     assert.equal((filter as { provider: string }).provider, 'github');
   } finally {
     IntegrationSyncJob.findOneAndUpdate = original;
+    IntegrationSyncJob.updateMany = originalUpdateMany;
   }
 });

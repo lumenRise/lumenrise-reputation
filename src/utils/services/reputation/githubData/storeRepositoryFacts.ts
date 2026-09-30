@@ -1,14 +1,14 @@
-import type { Types } from 'mongoose';
+import type { ClientSession, Types } from 'mongoose';
 
-import GitHubRepositoryFact from '../../../../models/GitHubRepositoryFact.js';
-import type { GitHubRepositoryNode } from '../../../../types/reputation/github.js';
-
+import GitHubRepositoryFact from '../../../../models/GitHubRepositoryFact';
+import type { GitHubRepositoryNode } from '../../../../types/reputation/github';
 const storeRepositoryFacts = async (
   snapshotId: Types.ObjectId,
   identityId: Types.ObjectId,
   providerAccountId: string,
   repositories: GitHubRepositoryNode[],
   collectedAt: Date,
+  session: ClientSession,
 ): Promise<void> => {
   const facts = repositories.map((repository) => ({
     snapshot: snapshotId,
@@ -31,7 +31,7 @@ const storeRepositoryFacts = async (
   }));
 
   for (let index = 0; index < facts.length; index += 500) {
-    await GitHubRepositoryFact.insertMany(facts.slice(index, index + 500));
+    await GitHubRepositoryFact.insertMany(facts.slice(index, index + 500), { session });
   }
 };
 

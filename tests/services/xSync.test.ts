@@ -1,9 +1,8 @@
 import { Types } from 'mongoose';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { syncXAccount } from '../../src/services/integration/xSync.js';
-import type { ExternalAccountDocument } from '../../src/types/integration/model.js';
-
+import { syncXAccount } from '../../src/services/integration/xSync';
+import type { ExternalAccountDocument } from '../../src/types/integration/model';
 const mocks = vi.hoisted(() => ({
   collectXData: vi.fn(),
   deleteSnapshot: vi.fn(),
@@ -17,31 +16,31 @@ const mocks = vi.hoisted(() => ({
   storeSocialScore: vi.fn(),
 }));
 
-vi.mock('../../src/models/ExternalAccount.js', () => ({
+vi.mock('../../src/models/ExternalAccount', () => ({
   default: {
     findOneAndUpdate: mocks.leaseAccount,
     updateOne: mocks.updateAccount,
   },
 }));
-vi.mock('../../src/models/XDataSnapshot.js', () => ({
+vi.mock('../../src/models/XDataSnapshot', () => ({
   default: { deleteOne: mocks.deleteSnapshot, deleteMany: mocks.deleteOldSnapshots },
 }));
-vi.mock('../../src/models/ReputationSnapshot.js', () => ({
+vi.mock('../../src/models/ReputationSnapshot', () => ({
   default: { deleteMany: mocks.deleteOldScores },
 }));
-vi.mock('../../src/models/IntegrationSyncJob.js', () => ({
+vi.mock('../../src/models/IntegrationSyncJob', () => ({
   default: { updateMany: mocks.clearOldJobResults },
 }));
-vi.mock('../../src/services/integration/providerCredential.js', () => ({
+vi.mock('../../src/services/integration/providerCredential', () => ({
   getProviderCredential: mocks.getCredential,
 }));
-vi.mock('../../src/utils/services/oauth/x/getAuthenticatedXUser.js', () => ({
+vi.mock('../../src/utils/services/oauth/x/getAuthenticatedXUser', () => ({
   getAuthenticatedXUser: mocks.getUser,
 }));
-vi.mock('../../src/services/reputation/xData.js', () => ({
+vi.mock('../../src/services/reputation/xData', () => ({
   collectXData: mocks.collectXData,
 }));
-vi.mock('../../src/services/reputation/socialScore.js', () => ({
+vi.mock('../../src/services/reputation/socialScore', () => ({
   calculateAndStoreSocialReputation: mocks.storeSocialScore,
 }));
 

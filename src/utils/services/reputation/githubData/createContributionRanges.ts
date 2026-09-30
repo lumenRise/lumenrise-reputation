@@ -1,6 +1,5 @@
-import type { GitHubContributionRange } from '../../../../types/reputation/github.js';
-import { MILLISECONDS_PER_DAY } from '../../../../constants/services/reputation/githubData.js';
-
+import type { GitHubContributionRange } from '../../../../types/reputation/github';
+import { MILLISECONDS_PER_DAY } from '../../../../constants/services/reputation/githubData';
 const createContributionRanges = (accountCreatedAt: Date, collectedAt: Date) => {
   const ranges: GitHubContributionRange[] = [];
 
