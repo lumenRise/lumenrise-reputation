@@ -56,4 +56,6 @@ npm --prefix "$repo_dir" run build
 )
 npm --prefix "$repo_dir" test
 npm --prefix "$repo_dir" run test:integration
+LUMENRISE_TEST_BROKER_OUTAGE=1 LUMENRISE_TEST_RABBITMQ_URL='amqp://127.0.0.1:5674' \
+  npm --prefix "$repo_dir" run test:integration
 npm --prefix "$repo_dir" run check:model-parity

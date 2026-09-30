@@ -13,10 +13,11 @@ import stopChild from './stopChild';
 import getFreePort from './getFreePort';
 import Identity from '../../src/models/Identity';
 
-test('API publishes a Stellar scan, Reputation processes it, and API reads the result', {
+test('API and Reputation complete a Stellar scan with or without RabbitMQ', {
   skip: !process.env.LUMENRISE_TEST_RABBITMQ_URL,
 }, async () => {
   const apiPath = process.env.LUMENRISE_API_PATH;
+  const brokerUnavailable = process.env.LUMENRISE_TEST_BROKER_OUTAGE === '1';
   if (!apiPath) {
     throw new Error('LUMENRISE_API_PATH is required');
   }
@@ -97,10 +98,12 @@ test('API publishes a Stellar scan, Reputation processes it, and API reads the r
     const createdBody = await created.json() as { result: { id: string } };
     assert.ok(createdBody.result.id);
 
-    broker = await amqp.connect(process.env.LUMENRISE_TEST_RABBITMQ_URL!);
-    channel = await broker.createChannel();
-    const queued = await channel.checkQueue('lumenrise.reputation.stellar-scan.v1');
-    assert.ok(queued.messageCount >= 1, 'API must publish a RabbitMQ message');
+    if (!brokerUnavailable) {
+      broker = await amqp.connect(process.env.LUMENRISE_TEST_RABBITMQ_URL!);
+      channel = await broker.createChannel();
+      const queued = await channel.checkQueue('lumenrise.reputation.stellar-scan.v1');
+      assert.ok(queued.messageCount >= 1, 'API must publish a RabbitMQ message');
+    }
 
     const worker = spawn(process.execPath, [resolve('dist/index.js')], {
       cwd: resolve('.'),
@@ -108,6 +111,17 @@ test('API publishes a Stellar scan, Reputation processes it, and API reads the r
       stdio: 'inherit',
     });
     children.push(worker);
+    if (brokerUnavailable) {
+      await waitFor(async () => {
+        try {
+          const response = await fetch(`http://127.0.0.1:${healthPort}/ready`);
+          const state = await response.json() as { mongoReady: boolean; rabbitmqReady: boolean };
+          return state.mongoReady && !state.rabbitmqReady;
+        } catch {
+          return false;
+        }
+      });
+    }
     await waitFor(async () => {
       const response = await fetch(scanUrl, { headers: cookie });
       if (!response.ok) {
