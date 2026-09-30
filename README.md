@@ -26,7 +26,7 @@ npm run dev
 
 SIGINT and SIGTERM stop the workers and close database and RabbitMQ connections. `npm run check` verifies TypeScript without producing build output.
 
-`npm test` runs worker and scoring tests. Set `LUMENRISE_TEST_DB_URI` to a disposable MongoDB replica set to include transactional integration tests; the suite creates and drops its own random databases. With Docker Compose available, `scripts/test-with-services.sh` starts isolated MongoDB and RabbitMQ and runs both repositories' checks. See [operations](docs/operations.md) for deployment, refresh, retention, and recovery behavior.
+`npm test` runs worker and scoring tests. Set `LUMENRISE_TEST_DB_URI` to a disposable MongoDB replica set to include transactional integration tests; the suite creates and drops its own random databases. With Docker Compose available, `scripts/test-with-services.sh` starts isolated MongoDB and RabbitMQ and runs both repositories' checks. See [operations](docs/operations.md) for deployment, refresh, retention, and recovery behavior, and the [acceptance report](docs/acceptance-2026-09-30.md) for verified results and remaining gates.
 
 ## Shared models
 
