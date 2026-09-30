@@ -10,6 +10,7 @@ import { X_SYNC_LEASE_MS, X_SYNC_MIN_INTERVAL_MS } from '../../constants/integra
 import { getAuthenticatedXUser } from '../../utils/services/oauth/x/getAuthenticatedXUser';
 import { resolveXAccessToken } from '../../utils/services/integration/xSync/resolveXAccessToken';
 import { getRetryAfterSeconds } from '../../utils/services/integration/githubSync/getRetryAfterSeconds';
+
 const syncXAccount = async (
   account: ExternalAccountDocument,
   now = new Date(),

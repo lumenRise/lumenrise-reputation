@@ -2,6 +2,7 @@ import isValidStellarGAddress from '../stellar/isValidStellarGAddress';
 import type { StellarPaymentFactRecord } from '../../types/sybil/network';
 import type { StellarActivityScanDocument } from '../../types/stellar/scan';
 import type { StellarOperationsResult } from '../../types/stellar/operations';
+
 const extractStellarPaymentFacts = (
   scan: StellarActivityScanDocument,
   page: StellarOperationsResult,

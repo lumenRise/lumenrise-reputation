@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import SorobanTransactionEvidence from '../../src/models/SorobanTransactionEvidence';
 import { processSorobanEvidence } from '../../src/utils/services/stellar/sorobanEvidenceWorker/processSorobanEvidence';
+
 const getNetwork = vi.fn();
 const getTransaction = vi.fn();
 vi.mock('@stellar/stellar-sdk', async (load) => ({

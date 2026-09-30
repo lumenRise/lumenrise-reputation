@@ -4,6 +4,7 @@ import {
   collectAllRepositories,
   createContributionRanges,
 } from '../../src/services/reputation/githubData';
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });

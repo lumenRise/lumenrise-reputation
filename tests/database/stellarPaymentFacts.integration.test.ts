@@ -16,6 +16,7 @@ import {
   createEmptyStellarActivityAggregate,
   mergeStellarActivityPage,
 } from '../../src/services/stellar/mergeActivityPage';
+
 const databaseName = `lumenrise_payment_test_${randomUUID().replaceAll('-', '')}`;
 const address = Keypair.random().publicKey();
 const counterparty = Keypair.random().publicKey();

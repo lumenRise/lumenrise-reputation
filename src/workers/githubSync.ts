@@ -5,6 +5,7 @@ import { startPolledQueueWorker } from './polledQueue';
 import claimGitHubSyncJob from './github/claimGitHubSyncJob';
 import processGitHubSyncJob from './github/processGitHubSyncJob';
 import { GITHUB_SYNC_QUEUE } from '../constants/services/integration/githubSyncQueue';
+
 const startGitHubSyncWorker = async (
   broker: ChannelModel | null,
   pollIntervalMs: number,

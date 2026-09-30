@@ -4,6 +4,7 @@ import type {
   StellarActivityMergeResult,
 } from '../../types/stellar/scan';
 import { createEmptyStellarActivityAggregate } from '../../utils/services/stellar/mergeActivityPage/createEmptyStellarActivityAggregate';
+
 const mergeStellarActivityPage = (
   current: StellarActivityAggregate,
   page: StellarOperationsResult,

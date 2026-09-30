@@ -9,6 +9,7 @@ import type {
   StellarActivityMergeResult,
   StellarActivityScanDocument,
 } from '../../types/stellar/scan';
+
 const persistStellarPaymentPage = async (
   scan: StellarActivityScanDocument,
   page: StellarOperationsResult,

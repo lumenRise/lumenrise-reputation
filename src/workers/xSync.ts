@@ -3,6 +3,7 @@ import type { ChannelModel } from 'amqplib';
 import parseJobId from './parseJobId';
 import processXSyncJob from './x/processXSyncJob';
 import { startPolledQueueWorker } from './polledQueue';
+
 const X_SYNC_QUEUE = 'lumenrise.reputation.x-sync.v1';
 
 const startXSyncWorker = async (

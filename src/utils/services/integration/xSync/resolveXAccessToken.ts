@@ -6,6 +6,7 @@ import {
   getProviderCredential,
   storeProviderCredential,
 } from '../../../../services/integration/providerCredential';
+
 const resolveXAccessToken = async (externalAccountId: Types.ObjectId): Promise<string | null> => {
   const credential = await getProviderCredential(externalAccountId);
 

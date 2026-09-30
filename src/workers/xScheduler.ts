@@ -1,6 +1,7 @@
 import env from '../env';
 import { X_SYNC_SCAN_INTERVAL_MS } from '../constants/services/integration/xScheduler';
 import { enqueueDueXSyncs } from '../utils/services/integration/xScheduler/enqueueDueXSyncs';
+
 const startXScheduler = () => {
   let activeScan: Promise<void> | null = null;
   const run = (): Promise<void> => {

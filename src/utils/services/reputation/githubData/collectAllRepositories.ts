@@ -3,6 +3,7 @@ import type {
   GitHubRepositoriesQueryData,
   GitHubRepositoryNode,
 } from '../../../../types/reputation/github';
+
 const collectAllRepositories = async (
   username: string,
   accessToken: string,

@@ -2,6 +2,7 @@ import type { Types } from 'mongoose';
 
 import IntegrationSyncJob from '../../models/IntegrationSyncJob';
 import type { IntegrationSyncJobDocument } from '../../types/integration/sync';
+
 const completeGitHubSyncJob = async (
   job: IntegrationSyncJobDocument,
   snapshotId: Types.ObjectId,

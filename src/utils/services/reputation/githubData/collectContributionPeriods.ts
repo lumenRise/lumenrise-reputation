@@ -5,6 +5,7 @@ import type {
   GitHubContributionRange,
   GitHubContributionsQueryData,
 } from '../../../../types/reputation/github';
+
 const collectContributionPeriods = async (
   username: string,
   accessToken: string,

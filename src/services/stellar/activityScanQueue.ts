@@ -3,6 +3,7 @@ import type { StellarActivityScanDocument } from '../../types/stellar/scan';
 import { SCAN_LEASE_MS } from '../../constants/services/stellar/activityScanQueue';
 import { retryDelay } from '../../utils/services/stellar/activityScanQueue/retryDelay';
 import { claimStellarActivityScan } from '../../utils/services/stellar/activityScanQueue/claimStellarActivityScan';
+
 const MAX_CONSECUTIVE_FAILURES = 5;
 
 const failStellarActivityScan = async (

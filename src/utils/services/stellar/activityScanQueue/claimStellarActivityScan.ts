@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import StellarActivityScan from '../../../../models/StellarActivityScan';
 import type { StellarActivityScanDocument } from '../../../../types/stellar/scan';
 import { SCAN_LEASE_MS } from '../../../../constants/services/stellar/activityScanQueue';
+
 const claimStellarActivityScan = async (
   scanId?: string,
   now = new Date(),

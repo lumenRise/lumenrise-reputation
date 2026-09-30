@@ -1,5 +1,6 @@
 import type env from './env';
 import parseProviderUrl from './utils/configuration/parseProviderUrl';
+
 const validateRuntimeConfiguration = (configuration: typeof env): void => {
   if (!Number.isSafeInteger(configuration.SYNC_WORKER_POLL_INTERVAL_MS) ||
       configuration.SYNC_WORKER_POLL_INTERVAL_MS <= 0) {

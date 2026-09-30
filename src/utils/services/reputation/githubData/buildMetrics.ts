@@ -6,6 +6,7 @@ import type {
   GitHubDataMetrics,
   GitHubRepositoryNode,
 } from '../../../../types/reputation/github';
+
 const buildMetrics = (
   user: GitHubUser,
   repositories: GitHubRepositoryNode[],

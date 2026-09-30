@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enqueueDueXSyncs } from '../../src/utils/services/integration/xScheduler/enqueueDueXSyncs';
+
 const mocks = vi.hoisted(() => ({
   findAccounts: vi.fn(),
   findJob: vi.fn(),

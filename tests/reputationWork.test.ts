@@ -5,6 +5,7 @@ import { calculateSocialScore } from '../src/utils/services/reputation/socialSco
 import { calculateDeveloperScore } from '../src/utils/services/reputation/developerScore/calculateDeveloperScore';
 import { normalizeDiminishingReturns } from '../src/utils/services/reputation/developerScore/normalizeDiminishingReturns';
 import { mergeStellarActivityPage, createEmptyStellarActivityAggregate } from '../src/services/stellar/mergeActivityPage';
+
 test('developer score normalizes available weights and caps growth', () => {
   const observedAt = new Date('2026-09-23T12:00:00Z');
   const result = calculateDeveloperScore([

@@ -1,5 +1,6 @@
 import IntegrationSyncJob from '../../models/IntegrationSyncJob';
 import type { IntegrationSyncJobDocument } from '../../types/integration/sync';
+
 const deferGitHubSyncJob = async (
   job: IntegrationSyncJobDocument,
   retryAfterSeconds: number,

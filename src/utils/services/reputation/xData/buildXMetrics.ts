@@ -1,6 +1,7 @@
 import type { XUser } from '../../../../types/integration/x';
 import type { XDataMetrics, XPost } from '../../../../types/reputation/x';
 import { MILLISECONDS_PER_DAY } from '../../../../constants/services/reputation/xData';
+
 const buildXMetrics = (user: XUser, posts: XPost[], collectedAt: Date): XDataMetrics => {
   const publicMetrics = user.public_metrics;
   const activeDays = new Set<string>();

@@ -5,6 +5,7 @@ import type {
   DeveloperReputationStatus,
   DeveloperSignalInput,
 } from '../../../../types/reputation/scoring';
+
 const calculateDeveloperScore = (
   inputs: DeveloperSignalInput[],
   status: DeveloperReputationStatus,

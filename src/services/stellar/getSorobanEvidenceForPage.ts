@@ -1,6 +1,7 @@
 import type { StellarActivityScanDocument } from '../../types/stellar/scan';
 import type { StellarOperationsResult } from '../../types/stellar/operations';
 import type { SorobanTransactionEvidenceInput } from '../../types/stellar/soroban';
+
 const getSorobanEvidenceForPage = (
   scan: StellarActivityScanDocument,
   page: StellarOperationsResult,

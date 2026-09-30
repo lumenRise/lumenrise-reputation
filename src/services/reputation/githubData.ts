@@ -13,6 +13,7 @@ import {
   GITHUB_GRAPHQL_URL,
 } from '../../constants/services/reputation/githubData';
 import { collectContributionPeriods } from '../../utils/services/reputation/githubData/collectContributionPeriods';
+
 const GITHUB_DATA_VERSION = 'github-data-v1';
 
 const collectGitHubData = async (

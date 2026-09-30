@@ -5,6 +5,7 @@ import type { ReputationSnapshotDocument } from '../../types/reputation/model';
 import { calculateSocialScore } from '../../utils/services/reputation/socialScore/calculateSocialScore';
 import { createXSocialSignals } from '../../utils/services/reputation/socialScore/createXSocialSignals';
 import { normalizeSocialSignal } from '../../utils/services/reputation/socialScore/normalizeSocialSignal';
+
 const SOCIAL_ALGORITHM_VERSION = 'social-v1';
 
 const calculateAndStoreSocialReputation = async (

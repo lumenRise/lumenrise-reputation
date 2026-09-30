@@ -1,5 +1,6 @@
 import { Types } from 'mongoose';
 import type { ConsumeMessage } from 'amqplib';
+
 const parseJobId = (message: ConsumeMessage): string | null => {
   try {
     const payload: unknown = JSON.parse(message.content.toString('utf8'));

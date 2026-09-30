@@ -2,6 +2,7 @@ import env from '../../../../env';
 import { enqueueXSync } from '../syncQueue/enqueueXSync';
 import ExternalAccount from '../../../../models/ExternalAccount';
 import IntegrationSyncJob from '../../../../models/IntegrationSyncJob';
+
 const enqueueDueXSyncs = async (now = new Date()): Promise<number> => {
   if (env.X_AUTO_SYNC_INTERVAL_HOURS <= 0) {
     return 0;

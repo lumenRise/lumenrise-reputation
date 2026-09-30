@@ -6,6 +6,7 @@ import type { XUser } from '../../src/types/integration/x';
 import XDataSnapshot from '../../src/models/XDataSnapshot';
 import XRateLimitError from '../../src/services/integration/xRateLimit';
 import { buildXMetrics, collectXData, collectXPosts } from '../../src/services/reputation/xData';
+
 const user: XUser = {
   id: '42',
   name: 'Developer',

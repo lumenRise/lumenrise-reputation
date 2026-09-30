@@ -5,6 +5,7 @@ import logEvent from '../../../../logEvent';
 import claimSorobanEvidence from './claimSorobanEvidence';
 import type { SorobanEventEvidence } from '../../../../types/stellar/soroban';
 import SorobanTransactionEvidence from '../../../../models/SorobanTransactionEvidence';
+
 const MAX_ATTEMPTS = 3;
 
 const processSorobanEvidence = async (): Promise<void> => {

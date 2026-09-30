@@ -2,6 +2,7 @@ import { getXTimelineUrl } from './getXTimelineUrl';
 import XRateLimitError from '../../../../services/integration/xRateLimit';
 import type { XPost, XTimelineResponse } from '../../../../types/reputation/x';
 import XApiResponseError from '../../../../services/integration/xApiResponseError';
+
 const collectXPosts = async (userId: string, accessToken: string): Promise<XPost[]> => {
   const posts: XPost[] = [];
   const observedPaginationTokens = new Set<string>();

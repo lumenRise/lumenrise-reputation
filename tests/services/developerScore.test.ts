@@ -4,6 +4,7 @@ import {
   calculateDeveloperScore,
   normalizeDiminishingReturns,
 } from '../../src/services/reputation/developerScore';
+
 describe('developer reputation scoring', () => {
   it('uses monotonic diminishing returns without a raw-value cutoff', () => {
     const atScale = normalizeDiminishingReturns(100, 100);

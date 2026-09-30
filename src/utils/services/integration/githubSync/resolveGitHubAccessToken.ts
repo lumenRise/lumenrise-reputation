@@ -6,6 +6,7 @@ import {
   getProviderCredential,
   storeProviderCredential,
 } from '../../../../services/integration/providerCredential';
+
 const resolveGitHubAccessToken = async (
   externalAccountId: Types.ObjectId,
 ): Promise<string | null> => {

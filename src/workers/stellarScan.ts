@@ -3,6 +3,7 @@ import type { ChannelModel } from 'amqplib';
 import parseJobId from './parseJobId';
 import { startPolledQueueWorker } from './polledQueue';
 import processStellarScanJob from './stellar/processStellarScanJob';
+
 const STELLAR_SCAN_QUEUE = 'lumenrise.reputation.stellar-scan.v1';
 
 const startStellarScanWorker = (broker: ChannelModel | null, pollIntervalMs: number) =>

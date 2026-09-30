@@ -9,6 +9,7 @@ import {
   MILLISECONDS_PER_DAY,
   X_TIMELINE_PAGE_SIZE,
 } from '../../constants/services/reputation/xData';
+
 const X_DATA_VERSION = 'x-data-v1';
 
 const collectXData = async (

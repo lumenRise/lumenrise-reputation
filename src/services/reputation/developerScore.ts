@@ -9,6 +9,7 @@ import type {
 } from '../../types/reputation/scoring';
 import { calculateDeveloperScore } from '../../utils/services/reputation/developerScore/calculateDeveloperScore';
 import { normalizeDiminishingReturns } from '../../utils/services/reputation/developerScore/normalizeDiminishingReturns';
+
 const DEVELOPER_ALGORITHM_VERSION = 'developer-v2';
 
 const calculateAndStoreDeveloperReputation = async (

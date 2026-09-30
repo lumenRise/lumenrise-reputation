@@ -7,6 +7,7 @@ import {
   createXSocialSignals,
   normalizeSocialSignal,
 } from '../../src/services/reputation/socialScore';
+
 const createSnapshot = (postsCollected: boolean) =>
   new XDataSnapshot({
     identity: new Types.ObjectId(),

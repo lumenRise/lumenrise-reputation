@@ -1,6 +1,7 @@
 import IntegrationSyncJob from '../../models/IntegrationSyncJob';
 import type { IntegrationSyncJobDocument } from '../../types/integration/sync';
 import { calculateSyncRetryDelay } from '../../utils/services/integration/syncQueue/calculateSyncRetryDelay';
+
 const failGitHubSyncJob = async (
   job: IntegrationSyncJobDocument,
   reason: string,

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { syncXAccount } from '../../src/services/integration/xSync';
 import type { ExternalAccountDocument } from '../../src/types/integration/model';
+
 const mocks = vi.hoisted(() => ({
   collectXData: vi.fn(),
   deleteSnapshot: vi.fn(),

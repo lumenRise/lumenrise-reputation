@@ -14,6 +14,7 @@ import { getRetryAfterSeconds } from '../../utils/services/integration/githubSyn
 import { getAuthenticatedGitHubUser } from '../../utils/services/oauth/github/getAuthenticatedGitHubUser';
 import { needsCredentialRefresh } from '../../utils/services/integration/githubSync/needsCredentialRefresh';
 import { resolveGitHubAccessToken } from '../../utils/services/integration/githubSync/resolveGitHubAccessToken';
+
 const syncGitHubAccount = async (
   account: ExternalAccountDocument,
   now = new Date(),

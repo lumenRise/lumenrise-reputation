@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+
 process.env.NODE_ENV = 'test';
 process.env.DB_URI = 'mongodb://127.0.0.1:27017';
 process.env.DB_NAME = 'lumenrise_test';

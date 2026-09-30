@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 
 import { startPolledQueueWorker } from '../src/workers/polledQueue';
+
 const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
 
 test('MongoDB polling runs without RabbitMQ and stops cleanly', async () => {

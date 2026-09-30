@@ -4,6 +4,7 @@ import IntegrationSyncJob from '../../../../models/IntegrationSyncJob';
 import type { IntegrationSyncJobDocument } from '../../../../types/integration/sync';
 import { SYNC_JOB_LEASE_MS } from '../../../../constants/services/integration/syncQueue';
 import finalizeExhaustedIntegrationSyncJobs from '../../../../workers/finalizeExhaustedIntegrationSyncJobs';
+
 const claimIntegrationSyncJob = async (
   jobId?: string,
   now = new Date(),

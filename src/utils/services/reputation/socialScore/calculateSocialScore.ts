@@ -4,6 +4,7 @@ import type {
   SocialScoreCalculation,
   SocialSignalInput,
 } from '../../../../types/reputation/socialScoring';
+
 const calculateSocialScore = (inputs: SocialSignalInput[]): SocialScoreCalculation => {
   if (inputs.some((input) => !Number.isFinite(input.baseWeight) || input.baseWeight <= 0)) {
     throw new Error('Social signal weights must be positive');

@@ -6,6 +6,7 @@ import {
   createEmptyStellarActivityAggregate,
   mergeStellarActivityPage,
 } from '../../src/services/stellar/mergeActivityPage';
+
 describe('Stellar activity scan aggregation', () => {
   it('deduplicates transaction and UTC day at a page boundary', () => {
     const first = createPage(

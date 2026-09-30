@@ -3,6 +3,7 @@ import { Types } from 'mongoose';
 import IntegrationSyncJob from '../../models/IntegrationSyncJob';
 import type { IntegrationSyncJobDocument } from '../../types/integration/sync';
 import finalizeExhaustedIntegrationSyncJobs from '../finalizeExhaustedIntegrationSyncJobs';
+
 const SYNC_JOB_LEASE_MS = 3_600_000;
 
 const claimGitHubSyncJob = async (

@@ -2,6 +2,7 @@ import type { ClientSession, Types } from 'mongoose';
 
 import GitHubRepositoryFact from '../../../../models/GitHubRepositoryFact';
 import type { GitHubRepositoryNode } from '../../../../types/reputation/github';
+
 const storeRepositoryFacts = async (
   snapshotId: Types.ObjectId,
   identityId: Types.ObjectId,

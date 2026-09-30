@@ -5,6 +5,7 @@ import { Keypair } from '@stellar/stellar-sdk';
 import createPage from '../utils/stellarActivityScan/createPage';
 import createOperation from '../utils/stellarActivityScan/createOperation';
 import extractStellarPaymentFacts from '../../src/utils/sybil/extractStellarPaymentFacts';
+
 const address = Keypair.random().publicKey();
 const counterparty = Keypair.random().publicKey();
 const stranger = Keypair.random().publicKey();

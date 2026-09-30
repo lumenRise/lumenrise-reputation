@@ -4,6 +4,7 @@ import {
   getRetryAfterSeconds,
   needsCredentialRefresh,
 } from '../../src/services/integration/githubSync';
+
 describe('GitHub synchronization', () => {
   it('refreshes an access token before it expires', () => {
     const now = new Date('2026-09-22T12:00:00.000Z');

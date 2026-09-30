@@ -7,6 +7,7 @@ import { failStellarActivityScan } from '../../src/services/stellar/activityScan
 import getStellarAccountOperations from '../../src/services/stellar/getAccountOperations';
 import persistStellarPaymentPage from '../../src/services/sybil/persistStellarPaymentPage';
 import { processStellarActivityScan } from '../../src/utils/services/stellar/activityScanWorker/processStellarActivityScan';
+
 vi.mock('../../src/services/stellar/getAccountOperations', () => ({ default: vi.fn() }));
 vi.mock('../../src/services/sybil/persistStellarPaymentPage', () => ({ default: vi.fn() }));
 vi.mock('../../src/services/stellar/activityScanQueue', () => ({
