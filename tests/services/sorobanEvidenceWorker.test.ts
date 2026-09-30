@@ -2,8 +2,8 @@ import { Types } from 'mongoose';
 import { Networks, rpc } from '@stellar/stellar-sdk';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import SorobanTransactionEvidence from '../../src/models/SorobanTransactionEvidence.js';
-import { processSorobanEvidence } from '../../src/utils/services/stellar/sorobanEvidenceWorker/processSorobanEvidence.js';
+import SorobanTransactionEvidence from '../../src/models/SorobanTransactionEvidence';
+import { processSorobanEvidence } from '../../src/utils/services/stellar/sorobanEvidenceWorker/processSorobanEvidence';
 
 const getNetwork = vi.fn();
 const getTransaction = vi.fn();
@@ -18,12 +18,13 @@ vi.mock('@stellar/stellar-sdk', async (load) => ({
     ),
   },
 }));
-vi.mock('../../src/models/SorobanTransactionEvidence.js', () => ({
-  default: { findOneAndUpdate: vi.fn(), updateOne: vi.fn() },
+vi.mock('../../src/models/SorobanTransactionEvidence', () => ({
+  default: { findOneAndUpdate: vi.fn(), updateOne: vi.fn(), updateMany: vi.fn() },
 }));
 
 const createCandidate = (attempts = 1) => ({
   _id: new Types.ObjectId(),
+  scan: new Types.ObjectId(),
   transactionHash: 'a'.repeat(64),
   leaseUntil: new Date('2026-09-26T12:01:00Z'),
   attempts,

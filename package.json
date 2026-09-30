@@ -8,11 +8,12 @@
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json --noEmit && esbuild src/index.ts --bundle --packages=external --platform=node --format=esm --target=node24 --outbase=src --outdir=dist",
     "start": "node dist/index.js",
     "check": "tsc -p tsconfig.json --noEmit",
     "test": "npm run test:worker && npm run test:unit",
     "test:worker": "node --import tsx --test tests/*.test.ts",
+    "test:integration": "node --import tsx --test tests/integration/*.test.ts",
     "test:unit": "DB_URI=mongodb://127.0.0.1:27017 DB_NAME=lumenrise_test RABBITMQ_URL=amqp://127.0.0.1 CREDENTIAL_ENCRYPTION_KEY=0000000000000000000000000000000000000000000000000000000000000000 vitest run tests/services tests/database",
     "check:model-parity": "node scripts/check-model-parity.mjs"
   },
@@ -27,6 +28,7 @@
     "@types/node": "26.6.2",
     "tsx": "4.23.15",
     "typescript": "6.0.3",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "esbuild": "0.28.2"
   }
 }

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getRetryAfterSeconds,
   needsCredentialRefresh,
-} from '../../src/services/integration/githubSync.js';
+} from '../../src/services/integration/githubSync';
 
 describe('GitHub synchronization', () => {
   it('refreshes an access token before it expires', () => {

@@ -1,12 +1,12 @@
 import { Types } from 'mongoose';
 import { describe, expect, it } from 'vitest';
 
-import XDataSnapshot from '../../src/models/XDataSnapshot.js';
+import XDataSnapshot from '../../src/models/XDataSnapshot';
 import {
   calculateSocialScore,
   createXSocialSignals,
   normalizeSocialSignal,
-} from '../../src/services/reputation/socialScore.js';
+} from '../../src/services/reputation/socialScore';
 
 const createSnapshot = (postsCollected: boolean) =>
   new XDataSnapshot({

@@ -1,4 +1,4 @@
-import { round } from './round.js';
+import { round } from './round';
 
 const normalizeDiminishingReturns = (rawValue: number, scale: number): number => {
   if (!Number.isFinite(scale) || scale <= 0) {

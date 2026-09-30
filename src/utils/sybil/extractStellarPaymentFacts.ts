@@ -1,7 +1,7 @@
-import isValidStellarGAddress from '../stellar/isValidStellarGAddress.js';
-import type { StellarPaymentFactRecord } from '../../types/sybil/network.js';
-import type { StellarActivityScanDocument } from '../../types/stellar/scan.js';
-import type { StellarOperationsResult } from '../../types/stellar/operations.js';
+import isValidStellarGAddress from '../stellar/isValidStellarGAddress';
+import type { StellarPaymentFactRecord } from '../../types/sybil/network';
+import type { StellarActivityScanDocument } from '../../types/stellar/scan';
+import type { StellarOperationsResult } from '../../types/stellar/operations';
 
 const extractStellarPaymentFacts = (
   scan: StellarActivityScanDocument,

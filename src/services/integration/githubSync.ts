@@ -1,17 +1,19 @@
-import ExternalAccount from '../../models/ExternalAccount.js';
-import { collectGitHubData } from '../reputation/githubData.js';
-import type { GitHubSyncOutcome } from '../../types/integration/sync.js';
-import type { ExternalAccountDocument } from '../../types/integration/model.js';
-import { calculateAndStoreDeveloperReputation } from '../reputation/developerScore.js';
-import { TOKEN_REFRESH_WINDOW_MS } from '../../constants/services/integration/githubSync.js';
-import { getRetryAfterSeconds } from '../../utils/services/integration/githubSync/getRetryAfterSeconds.js';
-import { getAuthenticatedGitHubUser } from '../../utils/services/oauth/github/getAuthenticatedGitHubUser.js';
-import { needsCredentialRefresh } from '../../utils/services/integration/githubSync/needsCredentialRefresh.js';
-import { resolveGitHubAccessToken } from '../../utils/services/integration/githubSync/resolveGitHubAccessToken.js';
+import ExternalAccount from '../../models/ExternalAccount';
+import { collectGitHubData } from '../reputation/githubData';
+import GitHubDataSnapshot from '../../models/GitHubDataSnapshot';
+import GitHubRepositoryFact from '../../models/GitHubRepositoryFact';
+import type { GitHubSyncOutcome } from '../../types/integration/sync';
+import type { ExternalAccountDocument } from '../../types/integration/model';
+import { calculateAndStoreDeveloperReputation } from '../reputation/developerScore';
+import { TOKEN_REFRESH_WINDOW_MS } from '../../constants/services/integration/githubSync';
 import {
   GITHUB_SYNC_LEASE_MS,
   GITHUB_SYNC_MIN_INTERVAL_MS,
-} from '../../constants/integration.js';
+} from '../../constants/integration';
+import { getRetryAfterSeconds } from '../../utils/services/integration/githubSync/getRetryAfterSeconds';
+import { getAuthenticatedGitHubUser } from '../../utils/services/oauth/github/getAuthenticatedGitHubUser';
+import { needsCredentialRefresh } from '../../utils/services/integration/githubSync/needsCredentialRefresh';
+import { resolveGitHubAccessToken } from '../../utils/services/integration/githubSync/resolveGitHubAccessToken';
 
 const syncGitHubAccount = async (
   account: ExternalAccountDocument,
@@ -76,8 +78,9 @@ const syncGitHubAccount = async (
       accessToken,
     );
 
-    await ExternalAccount.updateOne(
-      { _id: leasedAccount._id, status: 'connected' },
+    const updateResult = await ExternalAccount.updateOne(
+      { _id: leasedAccount._id, identity: leasedAccount.identity, provider: 'github',
+        providerAccountId: user.id.toString(), status: 'connected', syncLeaseUntil },
       {
         $set: {
           username: user.login,
@@ -90,7 +93,22 @@ const syncGitHubAccount = async (
       { runValidators: true },
     );
 
-    await calculateAndStoreDeveloperReputation(leasedAccount.identity);
+    if (updateResult.matchedCount === 0) {
+      await Promise.all([
+        GitHubRepositoryFact.deleteMany({ snapshot: snapshot._id }),
+        GitHubDataSnapshot.deleteOne({ _id: snapshot._id }),
+      ]);
+      return { state: 'disconnected' };
+    }
+
+    const reputation = await calculateAndStoreDeveloperReputation(snapshot);
+    if (!reputation) {
+      await Promise.all([
+        GitHubRepositoryFact.deleteMany({ snapshot: snapshot._id }),
+        GitHubDataSnapshot.deleteOne({ _id: snapshot._id }),
+      ]);
+      return { state: 'disconnected' };
+    }
 
     return { state: 'synchronized', snapshot };
   } finally {

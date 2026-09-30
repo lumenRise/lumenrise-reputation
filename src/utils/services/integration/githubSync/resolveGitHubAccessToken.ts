@@ -1,11 +1,11 @@
 import type { Types } from 'mongoose';
 
-import { needsCredentialRefresh } from './needsCredentialRefresh.js';
-import { refreshGitHubAccessToken } from '../../oauth/github/refreshGitHubAccessToken.js';
+import { needsCredentialRefresh } from './needsCredentialRefresh';
+import { refreshGitHubAccessToken } from '../../oauth/github/refreshGitHubAccessToken';
 import {
   getProviderCredential,
   storeProviderCredential,
-} from '../../../../services/integration/providerCredential.js';
+} from '../../../../services/integration/providerCredential';
 
 const resolveGitHubAccessToken = async (
   externalAccountId: Types.ObjectId,

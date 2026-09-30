@@ -1,5 +1,5 @@
-import type { XDataSnapshotDocument } from '../../../../types/reputation/x.js';
-import type { SocialSignalInput } from '../../../../types/reputation/socialScoring.js';
+import type { XDataSnapshotDocument } from '../../../../types/reputation/x';
+import type { SocialSignalInput } from '../../../../types/reputation/socialScoring';
 
 const createXSocialSignals = (snapshot: XDataSnapshotDocument): SocialSignalInput[] => {
   const observedAt = snapshot.collectedAt;

@@ -1,11 +1,11 @@
-import env from '../env.js';
-import { X_SYNC_SCAN_INTERVAL_MS } from '../constants/services/integration/xScheduler.js';
-import { enqueueDueXSyncs } from '../utils/services/integration/xScheduler/enqueueDueXSyncs.js';
+import env from '../env';
+import { X_SYNC_SCAN_INTERVAL_MS } from '../constants/services/integration/xScheduler';
+import { enqueueDueXSyncs } from '../utils/services/integration/xScheduler/enqueueDueXSyncs';
 
 const startXScheduler = () => {
   let activeScan: Promise<void> | null = null;
   const run = (): Promise<void> => {
-    if (activeScan) return activeScan;
+    if (activeScan) {return activeScan;}
     activeScan = enqueueDueXSyncs().then(() => {}).finally(() => { activeScan = null; });
     return activeScan;
   };
@@ -15,11 +15,11 @@ const startXScheduler = () => {
         void run().catch((error: unknown) => console.error('X sync scheduling failed', error));
       }, X_SYNC_SCAN_INTERVAL_MS)
     : null;
-  if (timer) void run().catch((error: unknown) => console.error('X sync scheduling failed', error));
+  if (timer) {void run().catch((error: unknown) => console.error('X sync scheduling failed', error));}
 
   return {
     stop: async (): Promise<void> => {
-      if (timer) clearInterval(timer);
+      if (timer) {clearInterval(timer);}
       await activeScan;
     },
   };

@@ -1,4 +1,4 @@
-import { X_TIMELINE_PAGE_SIZE } from '../../../../constants/services/reputation/xData.js';
+import { X_TIMELINE_PAGE_SIZE } from '../../../../constants/services/reputation/xData';
 
 const getXTimelineUrl = (userId: string, paginationToken?: string): URL => {
   const url = new URL(`https://api.x.com/2/users/${userId}/tweets`);

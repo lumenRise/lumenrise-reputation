@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { enqueueDueXSyncs } from '../../src/utils/services/integration/xScheduler/enqueueDueXSyncs.js';
+import { enqueueDueXSyncs } from '../../src/utils/services/integration/xScheduler/enqueueDueXSyncs';
 
 const mocks = vi.hoisted(() => ({
   findAccounts: vi.fn(),
@@ -9,20 +9,20 @@ const mocks = vi.hoisted(() => ({
   enqueueSync: vi.fn(),
 }));
 
-vi.mock('../../src/env.js', () => ({
+vi.mock('../../src/env', () => ({
   default: {
     NODE_ENV: 'test',
     LOG_LEVEL: 'silent',
     X_AUTO_SYNC_INTERVAL_HOURS: 24,
   },
 }));
-vi.mock('../../src/models/ExternalAccount.js', () => ({
+vi.mock('../../src/models/ExternalAccount', () => ({
   default: { find: mocks.findAccounts },
 }));
-vi.mock('../../src/models/IntegrationSyncJob.js', () => ({
+vi.mock('../../src/models/IntegrationSyncJob', () => ({
   default: { findOne: mocks.findJob },
 }));
-vi.mock('../../src/utils/services/integration/syncQueue/enqueueXSync.js', () => ({
+vi.mock('../../src/utils/services/integration/syncQueue/enqueueXSync', () => ({
   enqueueXSync: mocks.enqueueSync,
 }));
 

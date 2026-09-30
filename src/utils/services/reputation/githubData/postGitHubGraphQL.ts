@@ -1,5 +1,5 @@
-import type { GitHubGraphQLResponse } from '../../../../types/reputation/github.js';
-import { GITHUB_GRAPHQL_URL } from '../../../../constants/services/reputation/githubData.js';
+import type { GitHubGraphQLResponse } from '../../../../types/reputation/github';
+import { GITHUB_GRAPHQL_URL } from '../../../../constants/services/reputation/githubData';
 
 const postGitHubGraphQL = async <T>(
   accessToken: string,

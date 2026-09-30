@@ -1,7 +1,7 @@
-import { calculateXSyncSchedule } from './calculateXSyncSchedule.js';
-import { enqueueIntegrationSync } from './enqueueIntegrationSync.js';
-import type { ExternalAccountDocument } from '../../../../types/integration/model.js';
-import type { IntegrationSyncJobDocument } from '../../../../types/integration/sync.js';
+import { calculateXSyncSchedule } from './calculateXSyncSchedule';
+import { enqueueIntegrationSync } from './enqueueIntegrationSync';
+import type { ExternalAccountDocument } from '../../../../types/integration/model';
+import type { IntegrationSyncJobDocument } from '../../../../types/integration/sync';
 
 const enqueueXSync = async (
   account: ExternalAccountDocument,

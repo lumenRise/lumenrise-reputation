@@ -1,17 +1,18 @@
 import type { Types } from 'mongoose';
 
-import GitHubDataSnapshot from '../../models/GitHubDataSnapshot.js';
-import type { GitHubUser } from '../../types/integration/github.js';
-import type { GitHubDataSnapshotDocument } from '../../types/reputation/github.js';
-import { buildMetrics } from '../../utils/services/reputation/githubData/buildMetrics.js';
-import { storeRepositoryFacts } from '../../utils/services/reputation/githubData/storeRepositoryFacts.js';
-import { collectAllRepositories } from '../../utils/services/reputation/githubData/collectAllRepositories.js';
-import { createContributionRanges } from '../../utils/services/reputation/githubData/createContributionRanges.js';
+import { withDatabaseTransaction } from '../../db';
+import GitHubDataSnapshot from '../../models/GitHubDataSnapshot';
+import type { GitHubUser } from '../../types/integration/github';
+import type { GitHubDataSnapshotDocument } from '../../types/reputation/github';
+import { buildMetrics } from '../../utils/services/reputation/githubData/buildMetrics';
+import { storeRepositoryFacts } from '../../utils/services/reputation/githubData/storeRepositoryFacts';
+import { collectAllRepositories } from '../../utils/services/reputation/githubData/collectAllRepositories';
+import { createContributionRanges } from '../../utils/services/reputation/githubData/createContributionRanges';
 import {
   MILLISECONDS_PER_DAY,
   GITHUB_GRAPHQL_URL,
-} from '../../constants/services/reputation/githubData.js';
-import { collectContributionPeriods } from '../../utils/services/reputation/githubData/collectContributionPeriods.js';
+} from '../../constants/services/reputation/githubData';
+import { collectContributionPeriods } from '../../utils/services/reputation/githubData/collectContributionPeriods';
 
 const GITHUB_DATA_VERSION = 'github-data-v1';
 
@@ -39,32 +40,38 @@ const collectGitHubData = async (
 
   const metrics = buildMetrics(user, repositories, periods, collectedAt);
 
-  const snapshot = await GitHubDataSnapshot.create({
-    identity: identityId,
-    externalAccount: externalAccountId,
-    providerAccountId: user.id.toString(),
-    username: user.login,
-    status,
-    dataVersion: GITHUB_DATA_VERSION,
-    coverage: {
-      profile: true,
-      contributions: periodsResult.status === 'fulfilled',
-      repositories: repositoriesResult.status === 'fulfilled',
-    },
-    metrics,
-    contributionPeriods: periods,
-    collectedAt,
+  return withDatabaseTransaction(async (session) => {
+    const snapshots = await GitHubDataSnapshot.create([{
+      identity: identityId,
+      externalAccount: externalAccountId,
+      providerAccountId: user.id.toString(),
+      username: user.login,
+      status,
+      dataVersion: GITHUB_DATA_VERSION,
+      coverage: {
+        profile: true,
+        contributions: periodsResult.status === 'fulfilled',
+        repositories: repositoriesResult.status === 'fulfilled',
+      },
+      metrics,
+      contributionPeriods: periods,
+      collectedAt,
+    }], { session });
+    const snapshot = snapshots[0];
+    if (!snapshot) {
+      throw new Error('GitHub snapshot was not created');
+    }
+
+    await storeRepositoryFacts(
+      snapshot._id,
+      identityId,
+      user.id.toString(),
+      repositories,
+      collectedAt,
+      session,
+    );
+    return snapshot;
   });
-
-  await storeRepositoryFacts(
-    snapshot._id,
-    identityId,
-    user.id.toString(),
-    repositories,
-    collectedAt,
-  );
-
-  return snapshot;
 };
 
 export { buildMetrics, collectAllRepositories, collectGitHubData, createContributionRanges };

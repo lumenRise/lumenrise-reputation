@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   collectAllRepositories,
   createContributionRanges,
-} from '../../src/services/reputation/githubData.js';
+} from '../../src/services/reputation/githubData';
 
 afterEach(() => {
   vi.unstubAllGlobals();

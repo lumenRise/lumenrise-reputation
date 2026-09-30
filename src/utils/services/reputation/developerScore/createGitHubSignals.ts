@@ -1,5 +1,5 @@
-import type { DeveloperSignalInput } from '../../../../types/reputation/scoring.js';
-import type { GitHubDataSnapshotDocument } from '../../../../types/reputation/github.js';
+import type { DeveloperSignalInput } from '../../../../types/reputation/scoring';
+import type { GitHubDataSnapshotDocument } from '../../../../types/reputation/github';
 
 const createGitHubSignals = (snapshot: GitHubDataSnapshotDocument): DeveloperSignalInput[] => {
   const signals: DeveloperSignalInput[] = [

@@ -2,9 +2,9 @@ import { Types } from 'mongoose';
 import { describe, expect, it } from 'vitest';
 import { Keypair } from '@stellar/stellar-sdk';
 
-import createPage from '../utils/stellarActivityScan/createPage.js';
-import createOperation from '../utils/stellarActivityScan/createOperation.js';
-import extractStellarPaymentFacts from '../../src/utils/sybil/extractStellarPaymentFacts.js';
+import createPage from '../utils/stellarActivityScan/createPage';
+import createOperation from '../utils/stellarActivityScan/createOperation';
+import extractStellarPaymentFacts from '../../src/utils/sybil/extractStellarPaymentFacts';
 
 const address = Keypair.random().publicKey();
 const counterparty = Keypair.random().publicKey();

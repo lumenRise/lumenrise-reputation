@@ -1,14 +1,14 @@
-import { withDatabaseTransaction } from '../../db.js';
-import StellarPaymentFact from '../../models/StellarPaymentFact.js';
-import StellarActivityScan from '../../models/StellarActivityScan.js';
-import type { StellarOperationsResult } from '../../types/stellar/operations.js';
-import SorobanTransactionEvidence from '../../models/SorobanTransactionEvidence.js';
-import type { SorobanTransactionEvidenceInput } from '../../types/stellar/soroban.js';
-import extractStellarPaymentFacts from '../../utils/sybil/extractStellarPaymentFacts.js';
+import { withDatabaseTransaction } from '../../db';
+import StellarPaymentFact from '../../models/StellarPaymentFact';
+import StellarActivityScan from '../../models/StellarActivityScan';
+import type { StellarOperationsResult } from '../../types/stellar/operations';
+import SorobanTransactionEvidence from '../../models/SorobanTransactionEvidence';
+import type { SorobanTransactionEvidenceInput } from '../../types/stellar/soroban';
+import extractStellarPaymentFacts from '../../utils/sybil/extractStellarPaymentFacts';
 import type {
   StellarActivityMergeResult,
   StellarActivityScanDocument,
-} from '../../types/stellar/scan.js';
+} from '../../types/stellar/scan';
 
 const persistStellarPaymentPage = async (
   scan: StellarActivityScanDocument,

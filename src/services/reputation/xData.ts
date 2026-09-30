@@ -1,14 +1,14 @@
 import type { Types } from 'mongoose';
 
-import XDataSnapshot from '../../models/XDataSnapshot.js';
-import type { XUser } from '../../types/integration/x.js';
-import type { XDataSnapshotDocument } from '../../types/reputation/x.js';
-import { collectXPosts } from '../../utils/services/reputation/xData/collectXPosts.js';
-import { buildXMetrics } from '../../utils/services/reputation/xData/buildXMetrics.js';
+import XDataSnapshot from '../../models/XDataSnapshot';
+import type { XUser } from '../../types/integration/x';
+import type { XDataSnapshotDocument } from '../../types/reputation/x';
+import { collectXPosts } from '../../utils/services/reputation/xData/collectXPosts';
+import { buildXMetrics } from '../../utils/services/reputation/xData/buildXMetrics';
 import {
   MILLISECONDS_PER_DAY,
   X_TIMELINE_PAGE_SIZE,
-} from '../../constants/services/reputation/xData.js';
+} from '../../constants/services/reputation/xData';
 
 const X_DATA_VERSION = 'x-data-v1';
 

@@ -3,19 +3,19 @@ import { randomUUID } from 'node:crypto';
 import { Keypair, Networks, rpc } from '@stellar/stellar-sdk';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import createPage from '../utils/stellarActivityScan/createPage.js';
-import StellarPaymentFact from '../../src/models/StellarPaymentFact.js';
-import StellarActivityScan from '../../src/models/StellarActivityScan.js';
-import createOperation from '../utils/stellarActivityScan/createOperation.js';
-import type { StellarActivityScanDocument } from '../../src/types/stellar/scan.js';
-import SorobanTransactionEvidence from '../../src/models/SorobanTransactionEvidence.js';
-import { processSorobanEvidence } from '../../src/utils/services/stellar/sorobanEvidenceWorker/processSorobanEvidence.js';
-import persistStellarPaymentPage from '../../src/services/sybil/persistStellarPaymentPage.js';
-import getSorobanEvidenceForPage from '../../src/services/stellar/getSorobanEvidenceForPage.js';
+import createPage from '../utils/stellarActivityScan/createPage';
+import StellarPaymentFact from '../../src/models/StellarPaymentFact';
+import StellarActivityScan from '../../src/models/StellarActivityScan';
+import createOperation from '../utils/stellarActivityScan/createOperation';
+import type { StellarActivityScanDocument } from '../../src/types/stellar/scan';
+import SorobanTransactionEvidence from '../../src/models/SorobanTransactionEvidence';
+import persistStellarPaymentPage from '../../src/services/sybil/persistStellarPaymentPage';
+import getSorobanEvidenceForPage from '../../src/services/stellar/getSorobanEvidenceForPage';
+import { processSorobanEvidence } from '../../src/utils/services/stellar/sorobanEvidenceWorker/processSorobanEvidence';
 import {
   createEmptyStellarActivityAggregate,
   mergeStellarActivityPage,
-} from '../../src/services/stellar/mergeActivityPage.js';
+} from '../../src/services/stellar/mergeActivityPage';
 
 const databaseName = `lumenrise_payment_test_${randomUUID().replaceAll('-', '')}`;
 const address = Keypair.random().publicKey();

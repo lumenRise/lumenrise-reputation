@@ -1,15 +1,15 @@
-import { collectXData } from '../reputation/xData.js';
-import { getAuthenticatedXUser } from '../../utils/services/oauth/x/getAuthenticatedXUser.js';
-import { getRetryAfterSeconds } from '../../utils/services/integration/githubSync/getRetryAfterSeconds.js';
-import XDataSnapshot from '../../models/XDataSnapshot.js';
-import ExternalAccount from '../../models/ExternalAccount.js';
-import ReputationSnapshot from '../../models/ReputationSnapshot.js';
-import IntegrationSyncJob from '../../models/IntegrationSyncJob.js';
-import type { XSyncOutcome } from '../../types/integration/sync.js';
-import type { ExternalAccountDocument } from '../../types/integration/model.js';
-import { calculateAndStoreSocialReputation } from '../reputation/socialScore.js';
-import { X_SYNC_LEASE_MS, X_SYNC_MIN_INTERVAL_MS } from '../../constants/integration.js';
-import { resolveXAccessToken } from '../../utils/services/integration/xSync/resolveXAccessToken.js';
+import { collectXData } from '../reputation/xData';
+import XDataSnapshot from '../../models/XDataSnapshot';
+import ExternalAccount from '../../models/ExternalAccount';
+import ReputationSnapshot from '../../models/ReputationSnapshot';
+import IntegrationSyncJob from '../../models/IntegrationSyncJob';
+import type { XSyncOutcome } from '../../types/integration/sync';
+import type { ExternalAccountDocument } from '../../types/integration/model';
+import { calculateAndStoreSocialReputation } from '../reputation/socialScore';
+import { X_SYNC_LEASE_MS, X_SYNC_MIN_INTERVAL_MS } from '../../constants/integration';
+import { getAuthenticatedXUser } from '../../utils/services/oauth/x/getAuthenticatedXUser';
+import { resolveXAccessToken } from '../../utils/services/integration/xSync/resolveXAccessToken';
+import { getRetryAfterSeconds } from '../../utils/services/integration/githubSync/getRetryAfterSeconds';
 
 const syncXAccount = async (
   account: ExternalAccountDocument,
@@ -73,7 +73,8 @@ const syncXAccount = async (
     );
 
     const updateResult = await ExternalAccount.updateOne(
-      { _id: leasedAccount._id, provider: 'x', status: 'connected', syncLeaseUntil },
+      { _id: leasedAccount._id, identity: leasedAccount.identity, provider: 'x',
+        providerAccountId: user.id, status: 'connected', syncLeaseUntil },
       {
         $set: {
           username: user.username,

@@ -1,4 +1,4 @@
-import { round } from './round.js';
+import { round } from './round';
 
 const normalizeSocialSignal = (rawValue: number, scale: number): number => {
   if (!Number.isFinite(scale) || scale <= 0) {
