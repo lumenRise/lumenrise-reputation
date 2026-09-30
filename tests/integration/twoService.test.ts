@@ -27,9 +27,21 @@ test('API publishes a Stellar scan, Reputation processes it, and API reads the r
 
   const apiPort = await getFreePort();
   const healthPort = await getFreePort();
-  const horizon: Server = createServer((_request, response) => {
+  const address = Keypair.random().publicKey();
+  const horizon: Server = createServer((request, response) => {
+    const cursor = new URL(request.url ?? '/', 'http://127.0.0.1').searchParams.get('cursor');
+    const records = cursor ? [] : Array.from({ length: 200 }, (_, index) => ({
+      id: String(200 - index),
+      paging_token: String(200 - index),
+      type: 'manage_buy_offer',
+      type_i: 12,
+      created_at: '2026-09-30T12:00:00Z',
+      transaction_hash: (200 - index).toString(16).padStart(64, '0'),
+      source_account: address,
+      transaction_successful: true,
+    }));
     response.writeHead(200, { 'content-type': 'application/json' });
-    response.end(JSON.stringify({ _embedded: { records: [] } }));
+    response.end(JSON.stringify({ _embedded: { records } }));
   });
   await new Promise<void>((resolve) => horizon.listen(0, '127.0.0.1', resolve));
   const addressInfo = horizon.address();
@@ -78,7 +90,6 @@ test('API publishes a Stellar scan, Reputation processes it, and API reads the r
       }
     });
 
-    const address = Keypair.random().publicKey();
     const scanUrl = `${apiUrl}/v1/stellar/accounts/${address}/activity-scan`;
     const cookie = { Cookie: `lumenrise_session=${token}` };
     const created = await fetch(scanUrl, { method: 'POST', headers: cookie });
@@ -111,13 +122,21 @@ test('API publishes a Stellar scan, Reputation processes it, and API reads the r
       identity: identity._id,
     });
     assert.equal(stored?.status, 'completed');
+    assert.equal(stored?.pagesProcessed, 2);
     const score = await fetch(`${apiUrl}/v1/stellar/accounts/${address}/activity-score`, {
       headers: cookie,
     });
     assert.equal(score.status, 200);
-    const scoreBody = await score.json() as { result: { address: string; ownershipVerified: boolean } };
+    const scoreBody = await score.json() as { result: {
+      address: string;
+      ownershipVerified: boolean;
+      pagesProcessed: number;
+      score: number;
+    } };
     assert.equal(scoreBody.result.address, address);
     assert.equal(scoreBody.result.ownershipVerified, false);
+    assert.equal(scoreBody.result.pagesProcessed, 2);
+    assert.ok(scoreBody.result.score > 0);
   } finally {
     for (const child of children.reverse()) {
       await stopChild(child);

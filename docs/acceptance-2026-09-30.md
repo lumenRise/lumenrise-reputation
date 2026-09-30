@@ -13,7 +13,7 @@ Starting revisions: API `da27d65`; Reputation `3faea60`. Reviewed implementation
 | Reputation starts after migration and checks indexes | Passed against disposable MongoDB |
 | Startup with RabbitMQ unavailable | Passed: MongoDB polling and private readiness stayed active |
 | Live RabbitMQ delivery and worker consumption | Passed on isolated local broker at `127.0.0.1:5673` |
-| Two-service Stellar queue to API score test | Passed: 1 test, 0 skipped, using isolated RabbitMQ and disposable MongoDB |
+| Two-service multi-page Stellar queue to API score test | Passed: 1 test, 0 skipped, using controlled two-page Horizon responses, isolated RabbitMQ, and disposable MongoDB |
 | Live broker disconnect, reconnect, and restart | Pending |
 | GitHub and X controlled-provider, two-service acceptance | Pending |
 | Staging alert delivery and rollout | Pending operator infrastructure |
@@ -22,4 +22,4 @@ The local machine cannot access its Docker daemon socket, including with sandbox
 
 Policy decision recorded from the user: GitHub and X refresh are manual only; scores and provider snapshots have 90-day validity/retention; each identity retains at most 20 completed Stellar scans. Existing 15-minute manual refresh cooldown applies. A disconnected provider's old score is unavailable immediately.
 
-Before final acceptance, run `scripts/test-with-services.sh` with Docker access, review the GitHub Actions runs with cross-repository read tokens, and exercise controlled GitHub/X OAuth and sync, broker outage and restart, multi-page Stellar, Soroban evidence, profile, and Policy responses against the same disposable stack. Record the final commit IDs and results here. Do not begin the Token Launch data contract until those pass.
+Before final acceptance, run `scripts/test-with-services.sh` with Docker access, review the GitHub Actions runs with cross-repository read tokens, and exercise controlled GitHub/X OAuth and sync, broker outage and restart, Soroban evidence, profile, and Policy responses against the same disposable stack. Record the final commit IDs and results here. Do not begin the Token Launch data contract until those pass.
