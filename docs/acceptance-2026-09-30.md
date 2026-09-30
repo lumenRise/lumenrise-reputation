@@ -15,7 +15,12 @@ Starting revisions: API `da27d65`; Reputation `3faea60`. Reviewed implementation
 | Live RabbitMQ delivery and worker consumption | Passed on isolated local broker at `127.0.0.1:5673` |
 | Two-service multi-page Stellar queue to API score test | Passed: 1 test, 0 skipped, using controlled two-page Horizon responses, isolated RabbitMQ, and disposable MongoDB |
 | Live broker disconnect, reconnect, and restart | Passed: worker readiness changed `false → true → false → true`, with consumer reconnection logs after each broker start |
+| Manual refresh limits | Passed in API database integration tests |
+| Policy evaluation from a completed scan in MongoDB | Passed in the two-service integration test, including the broker outage run |
+| Previous-account score isolation after disconnect/reconnect | Passed for GitHub and X in API database integration tests and worker race tests |
+| Soroban persistence rollback and evidence states | Passed in Reputation database and controlled RPC tests |
 | GitHub and X controlled-provider, two-service acceptance | Pending |
+| Profile response in a live two-service flow | Passed: primary wallet score read from completed MongoDB scan, with verified ownership flag |
 | Staging alert delivery and rollout | Pending operator infrastructure |
 
 The local machine cannot access its Docker daemon socket, including with sandbox escalation, so `scripts/test-with-services.sh` could not run here. An isolated RabbitMQ instance was started directly with its data and logs under `/tmp` for the live delivery test. The outage run pointed both services at an unused local port and passed without RabbitMQ. All database tests used only the disposable MongoDB instance at `127.0.0.1:27019`; they did not touch production data. The integrated test is skipped when `LUMENRISE_TEST_RABBITMQ_URL` is absent, so only the explicit live runs above count as integration passes.

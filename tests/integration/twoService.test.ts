@@ -12,6 +12,7 @@ import waitFor from './waitFor';
 import stopChild from './stopChild';
 import getFreePort from './getFreePort';
 import Identity from '../../src/models/Identity';
+import StellarAccount from '../../src/models/StellarAccount';
 
 test('API and Reputation complete a Stellar scan with or without RabbitMQ', {
   skip: !process.env.LUMENRISE_TEST_RABBITMQ_URL,
@@ -68,6 +69,12 @@ test('API and Reputation complete a Stellar scan with or without RabbitMQ', {
   try {
     await mongoose.connect(databaseUri, { dbName: environment.DB_NAME });
     const identity = await Identity.create({ name: 'Two-service test' });
+    await StellarAccount.create({
+      identity: identity._id,
+      address,
+      isPrimary: true,
+      connectedAt: new Date(),
+    });
     const token = randomUUID();
     await mongoose.connection.collection('sessions').insertOne({
       identity: identity._id,
@@ -151,6 +158,37 @@ test('API and Reputation complete a Stellar scan with or without RabbitMQ', {
     assert.equal(scoreBody.result.ownershipVerified, false);
     assert.equal(scoreBody.result.pagesProcessed, 2);
     assert.ok(scoreBody.result.score > 0);
+
+    const profile = await fetch(`${apiUrl}/v1/reputation/profile`, { headers: cookie });
+    assert.equal(profile.status, 200);
+    const profileBody = await profile.json() as { result: {
+      identity: { primaryWalletAddress: string };
+      stellar: { ownershipVerified: boolean; score: { scanId: string; score: number } };
+    } };
+    assert.equal(profileBody.result.identity.primaryWalletAddress, address);
+    assert.equal(profileBody.result.stellar.ownershipVerified, true);
+    assert.equal(profileBody.result.stellar.score.scanId, createdBody.result.id);
+    assert.equal(profileBody.result.stellar.score.score, scoreBody.result.score);
+
+    const policyKey = `stellar-${randomUUID().slice(0, 8)}`;
+    const policy = await fetch(`${apiUrl}/v1/policies`, {
+      method: 'POST',
+      headers: { ...cookie, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        key: policyKey,
+        version: 1,
+        match: 'all',
+        rules: [{ dimension: 'stellar', minScore: 0, maxAgeSeconds: 86_400 }],
+      }),
+    });
+    assert.equal(policy.status, 201);
+    const evaluation = await fetch(`${apiUrl}/v1/policies/${policyKey}/evaluate`, {
+      method: 'POST',
+      headers: cookie,
+    });
+    assert.equal(evaluation.status, 200);
+    const evaluationBody = await evaluation.json() as { result: { decision: string } };
+    assert.equal(evaluationBody.result.decision, 'eligible');
   } finally {
     for (const child of children.reverse()) {
       await stopChild(child);
