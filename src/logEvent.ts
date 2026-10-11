@@ -1,18 +1,13 @@
+import log from './logger';
+
 type LogField = string | number | boolean | null;
 
 const logEvent = (
-  level: 'info' | 'warn' | 'error',
+  level: 'info' | 'warn' | 'error' | 'fatal',
   event: string,
   fields: Record<string, LogField> = {},
 ): void => {
-  const entry = JSON.stringify({ level, event, time: new Date().toISOString(), ...fields });
-  if (level === 'error') {
-    console.error(entry);
-  } else if (level === 'warn') {
-    console.warn(entry);
-  } else {
-    console.info(entry);
-  }
+  log[level]({ ...fields, event }, event);
 };
 
 export default logEvent;

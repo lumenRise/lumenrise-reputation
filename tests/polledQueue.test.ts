@@ -2,7 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { EventEmitter } from 'node:events';
 
-import { startPolledQueueWorker } from '../src/workers/polledQueue';
+process.env.NODE_ENV = 'test';
+process.env.DB_URI = 'mongodb://127.0.0.1:27017';
+process.env.DB_NAME = 'lumenrise_test';
+process.env.RABBITMQ_URL = 'amqp://127.0.0.1:5672';
+process.env.CREDENTIAL_ENCRYPTION_KEY = '0'.repeat(64);
+
+const { startPolledQueueWorker } = await import('../src/workers/polledQueue');
 
 const flush = () => new Promise<void>((resolve) => setImmediate(resolve));
 

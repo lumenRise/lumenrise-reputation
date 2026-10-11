@@ -6,6 +6,12 @@ const schema = defineConfig({
     values: ['development', 'test', 'production'],
     default: 'development',
   },
+  LOG_LEVEL: {
+    type: 'enum',
+    values: ['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'],
+    default: 'info',
+    description: 'Logging verbosity.',
+  },
   DB_URI: { description: 'MongoDB connection string shared with the API.' },
   DB_NAME: { description: 'MongoDB database name shared with the API.' },
   RABBITMQ_URL: { description: 'RabbitMQ connection string shared with the API.' },
