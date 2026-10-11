@@ -1,25 +1,38 @@
 import env from '../env';
+import logEvent from '../logEvent';
 import { X_SYNC_SCAN_INTERVAL_MS } from '../constants/services/integration/xScheduler';
 import { enqueueDueXSyncs } from '../utils/services/integration/xScheduler/enqueueDueXSyncs';
 
 const startXScheduler = () => {
   let activeScan: Promise<void> | null = null;
+
   const run = (): Promise<void> => {
     if (activeScan) {return activeScan;}
     activeScan = enqueueDueXSyncs().then(() => {}).finally(() => { activeScan = null; });
     return activeScan;
   };
 
+  const onError = (error: unknown): void =>
+    logEvent('error', 'x_sync_scheduling_failed', {
+      errorName: error instanceof Error ? error.name : 'UnknownError',
+    });
+
   const timer = env.X_AUTO_SYNC_INTERVAL_HOURS > 0
     ? setInterval(() => {
-        void run().catch((error: unknown) => console.error('X sync scheduling failed', error));
+        void run().catch(onError);
       }, X_SYNC_SCAN_INTERVAL_MS)
     : null;
-  if (timer) {void run().catch((error: unknown) => console.error('X sync scheduling failed', error));}
+
+  if (timer) {
+    void run().catch(onError);
+  }
 
   return {
     stop: async (): Promise<void> => {
-      if (timer) {clearInterval(timer);}
+      if (timer) {
+        clearInterval(timer);
+      }
+
       await activeScan;
     },
   };
