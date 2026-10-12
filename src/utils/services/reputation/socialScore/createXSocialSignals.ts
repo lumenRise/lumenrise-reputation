@@ -1,86 +1,61 @@
 import type { XDataSnapshotDocument } from '../../../../types/reputation/x';
 import type { SocialSignalInput } from '../../../../types/reputation/socialScoring';
+import {
+  SOCIAL_PROFILE_WEIGHT,
+  SOCIAL_NETWORK_WEIGHT,
+  X_PROFILE_SIGNALS,
+  X_PRIORITY_WEIGHTS,
+  X_CONNECTION_WEIGHTS,
+  X_SOCIAL_CATEGORIES,
+} from '../../../../constants/services/reputation/socialScore';
 
 const createXSocialSignals = (snapshot: XDataSnapshotDocument): SocialSignalInput[] => {
   const observedAt = snapshot.collectedAt;
   const metrics = snapshot.metrics;
+  const signals: SocialSignalInput[] = X_PROFILE_SIGNALS.map((signal) => ({
+    key: signal.key,
+    rawValue: metrics[signal.metric],
+    baseWeight: SOCIAL_PROFILE_WEIGHT * signal.weight,
+    scale: signal.scale,
+    normalization: 'diminishing_returns',
+    observedAt,
+  }));
 
-  const signals: SocialSignalInput[] = [
-    {
-      key: 'account_age_days',
-      rawValue: metrics.accountAgeDays,
-      baseWeight: 0.12,
-      scale: 730,
-      observedAt,
-    },
-    {
-      key: 'follower_count',
-      rawValue: metrics.followerCount,
-      baseWeight: 0.12,
-      scale: 500,
-      observedAt,
-    },
-    {
-      key: 'listed_count',
-      rawValue: metrics.listedCount,
-      baseWeight: 0.04,
-      scale: 20,
-      observedAt,
-    },
-    {
-      key: 'reported_post_count',
-      rawValue: metrics.reportedPostCount,
-      baseWeight: 0.08,
-      scale: 500,
-      observedAt,
-    },
-  ];
+  const connections = new Map(
+    (snapshot.connections ?? []).map((connection) => [
+      connection.username.toLowerCase(),
+      connection.connectionStatus,
+    ]),
+  );
 
-  if (snapshot.coverage.posts) {
-    signals.push(
-      {
-        key: 'active_day_count',
-        rawValue: metrics.activeDayCount,
-        baseWeight: 0.18,
-        scale: 90,
-        observedAt,
-      },
-      {
-        key: 'original_post_count',
-        rawValue: metrics.originalPostCount,
-        baseWeight: 0.16,
-        scale: 150,
-        observedAt,
-      },
-      {
-        key: 'reply_post_count',
-        rawValue: metrics.replyPostCount,
-        baseWeight: 0.1,
-        scale: 100,
-        observedAt,
-      },
-      {
-        key: 'received_like_count',
-        rawValue: metrics.receivedLikeCount,
-        baseWeight: 0.08,
-        scale: 1_000,
-        observedAt,
-      },
-      {
-        key: 'received_repost_count',
-        rawValue: metrics.receivedRepostCount,
-        baseWeight: 0.06,
-        scale: 200,
-        observedAt,
-      },
-      {
-        key: 'received_reply_count',
-        rawValue: metrics.receivedReplyCount,
-        baseWeight: 0.06,
-        scale: 200,
-        observedAt,
-      },
+  for (const category of X_SOCIAL_CATEGORIES) {
+    const totalPriority = category.accounts.reduce(
+      (total, account) => total + X_PRIORITY_WEIGHTS[account.priority],
+      0,
     );
+
+    for (const account of category.accounts) {
+      const statuses = connections.get(account.username.toLowerCase()) ?? [];
+
+      const rawValue =
+        (statuses.includes('following') ? X_CONNECTION_WEIGHTS.following : 0) +
+        (statuses.includes('followed_by')
+          ? X_CONNECTION_WEIGHTS.followed_by
+          : 0);
+
+      signals.push({
+        key: `${category.key}:${account.username}`,
+        rawValue,
+        baseWeight:
+          (SOCIAL_NETWORK_WEIGHT *
+            category.weight *
+            X_PRIORITY_WEIGHTS[account.priority]) /
+          totalPriority,
+        scale: 1,
+        normalization: 'linear',
+        observedAt,
+      });
+    }
   }
 
   return signals;

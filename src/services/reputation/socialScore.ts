@@ -6,7 +6,7 @@ import { calculateSocialScore } from '../../utils/services/reputation/socialScor
 import { createXSocialSignals } from '../../utils/services/reputation/socialScore/createXSocialSignals';
 import { normalizeSocialSignal } from '../../utils/services/reputation/socialScore/normalizeSocialSignal';
 
-const SOCIAL_ALGORITHM_VERSION = 'social-v1';
+const SOCIAL_ALGORITHM_VERSION = 'social-v2';
 
 const calculateAndStoreSocialReputation = async (
   snapshot: XDataSnapshotDocument,
@@ -29,7 +29,7 @@ const calculateAndStoreSocialReputation = async (
   const reputation = await ReputationSnapshot.create({
     identity: snapshot.identity,
     category: 'social',
-    status: snapshot.status,
+    status: 'complete',
     algorithmVersion: SOCIAL_ALGORITHM_VERSION,
     score: calculation.score,
     signals: calculation.signals,
