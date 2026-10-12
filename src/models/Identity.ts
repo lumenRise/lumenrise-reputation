@@ -5,6 +5,7 @@ import type { IdentityRecord } from '../types/identity/model';
 
 const identitySchema = new Schema<IdentityRecord>(
   {
+    externalUserId: { type: String, default: null },
     name: { type: String, default: null, trim: true, maxlength: 80 },
     status: {
       type: String,
@@ -20,6 +21,15 @@ const identitySchema = new Schema<IdentityRecord>(
   {
     timestamps: true,
     versionKey: false,
+  },
+);
+
+identitySchema.index(
+  { externalUserId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { externalUserId: { $type: 'string' } },
+    name: 'identities_external_user_unique',
   },
 );
 
