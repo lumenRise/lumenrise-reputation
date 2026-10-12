@@ -101,4 +101,17 @@ describe('X account synchronization', () => {
     expect(mocks.deleteOldSnapshots).toHaveBeenCalledOnce();
     expect(mocks.deleteOldScores).toHaveBeenCalledOnce();
   });
+  it('does not fetch X again before 30 days have passed', async () => {
+    const now = new Date('2026-10-13T00:00:00.000Z');
+    const recentAccount = {
+      ...account,
+      lastSyncedAt: new Date('2026-10-12T00:00:00.000Z'),
+    } as ExternalAccountDocument;
+    await expect(syncXAccount(recentAccount, now)).resolves.toEqual({
+      state: 'too_recent',
+      retryAfterSeconds: 29 * 86400,
+    });
+    expect(mocks.leaseAccount).not.toHaveBeenCalled();
+    expect(mocks.getUser).not.toHaveBeenCalled();
+  });
 });
