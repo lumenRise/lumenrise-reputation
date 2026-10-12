@@ -7,6 +7,8 @@ const identitySchema = new Schema<IdentityRecord>(
   {
     externalUserId: { type: String, default: null },
     name: { type: String, default: null, trim: true, maxlength: 80 },
+    avatarObjectKey: { type: String, default: null, select: false },
+    avatarUrl: { type: String, default: null },
     status: {
       type: String,
       enum: IDENTITY_STATUSES,

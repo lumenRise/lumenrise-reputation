@@ -5,6 +5,8 @@ type IdentityStatus = 'active' | 'suspended' | 'deleted';
 interface IdentityRecord {
   externalUserId: string | null;
   name: string | null;
+  avatarObjectKey: string | null;
+  avatarUrl: string | null;
   status: IdentityStatus;
   deletedAt: Date | null;
   createdAt: Date;
