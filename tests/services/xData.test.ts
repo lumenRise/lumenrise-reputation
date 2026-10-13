@@ -5,7 +5,9 @@ import type { XPost } from '../../src/types/reputation/x';
 import type { XUser } from '../../src/types/integration/x';
 import XDataSnapshot from '../../src/models/XDataSnapshot';
 import XRateLimitError from '../../src/services/integration/xRateLimit';
+import { X_SOCIAL_CATEGORIES } from '../../src/constants/services/reputation/socialScore';
 import { buildXMetrics, collectXData, collectXPosts } from '../../src/services/reputation/xData';
+import { collectXConnections } from '../../src/utils/services/reputation/xData/collectXConnections';
 
 const user: XUser = {
   id: '42',
@@ -93,7 +95,7 @@ describe('X data collection', () => {
     expect(fetchMock).toHaveBeenCalledOnce();
   });
 
-  it('does not save a successful snapshot when a timeline page fails', async () => {
+  it('does not save a successful snapshot when the connection lookup fails', async () => {
     const createSnapshot = vi.spyOn(XDataSnapshot, 'create');
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ errors: [{ detail: 'Timeline unavailable' }] }), {
@@ -112,10 +114,16 @@ describe('X data collection', () => {
 
   it('reports depleted credits as a nonretryable X API error', async () => {
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(JSON.stringify({ title: 'Payment Required', detail: 'credits depleted' }), {
-        status: 402,
-        headers: { 'Content-Type': 'application/json' },
-      }),
+      new Response(
+        JSON.stringify({
+          title: 'Payment Required',
+          detail: 'credits depleted',
+        }),
+        {
+          status: 402,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      ),
     );
 
     vi.stubGlobal('fetch', fetchMock);
@@ -174,5 +182,84 @@ describe('X data collection', () => {
     expect(metrics.receivedLikeCount).toBe(7);
     expect(metrics.receivedBookmarkCount).toBe(4);
     expect(metrics.impressionCount).toBe(100);
+  });
+  it('looks up all 40 accounts in one user-authenticated request and treats absent connections as zero', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          data: [
+            { username: 'stellarorg', connection_status: ['following'] },
+            {
+              username: 'BuildOnStellar',
+              connection_status: ['followed_by'],
+            },
+            { username: 'jricetweets', connection_status: [] },
+            { username: 'kalepail' },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    const connections = await collectXConnections('user-token');
+    const url = new URL(fetchMock.mock.calls[0]?.[0]);
+    expect(url.pathname).toBe('/2/users/by');
+    expect(url.searchParams.get('user.fields')).toBe('connection_status');
+    expect(url.searchParams.get('usernames')?.split(',')).toHaveLength(40);
+    expect(fetchMock.mock.calls[0]?.[1].headers.Authorization).toBe('Bearer user-token');
+    expect(connections[0]?.connectionStatus).toEqual(['following']);
+    expect(connections[1]?.connectionStatus).toEqual(['followed_by']);
+    expect(connections[2]?.connectionStatus).toEqual([]);
+    expect(connections[3]?.connectionStatus).toEqual([]);
+    expect(connections[4]?.connectionStatus).toEqual([]);
+  });
+
+  it.each([true, false])(
+    'stores connection coverage and skips the timeline (complete=%s)',
+    async (complete) => {
+      const data = X_SOCIAL_CATEGORIES.flatMap((category) =>
+        category.accounts.map((account) => ({
+          username: account.username,
+          connection_status: [],
+        })),
+      );
+      if (!complete) {
+        data.pop();
+      }
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(new Response(JSON.stringify({ data }), { status: 200 })),
+      );
+      const create = vi.spyOn(XDataSnapshot, 'create').mockResolvedValue({} as never);
+      await collectXData(new Types.ObjectId(), new Types.ObjectId(), user, 'user-token');
+      expect(fetch).toHaveBeenCalledOnce();
+      expect(create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          dataVersion: 'x-data-v2',
+          status: 'complete',
+          coverage: { profile: true, posts: false, connections: true },
+          connections: expect.arrayContaining([
+            expect.objectContaining({ username: 'StellarOrg' }),
+          ]),
+        }),
+      );
+    },
+  );
+
+  it('uses reset headers for a rate-limited connection lookup', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(null, {
+          status: 429,
+          headers: {
+            'x-rate-limit-reset': String(Math.floor(Date.now() / 1000) + 120),
+          },
+        }),
+      ),
+    );
+    await expect(collectXConnections('user-token')).rejects.toMatchObject({
+      name: 'XRateLimitError',
+    });
   });
 });

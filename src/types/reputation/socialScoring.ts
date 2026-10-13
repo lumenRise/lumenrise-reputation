@@ -5,6 +5,7 @@ interface SocialSignalInput {
   rawValue: number;
   baseWeight: number;
   scale: number;
+  normalization: 'diminishing_returns' | 'linear';
   observedAt: Date;
 }
 
