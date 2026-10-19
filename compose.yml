@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   reputation:
     build: .
@@ -11,7 +10,7 @@ services:
       HEALTH_PORT: 5001
       DB_URI: mongodb://mongo:27017/?replicaSet=rs0
       DB_NAME: ${DB_NAME:-lumenrise}
-      RABBITMQ_URL: amqp://lumenrise:${RABBITMQ_PASSWORD:?Set the same RABBITMQ_PASSWORD as the API}@rabbitmq:5672
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-lumenrise}:${RABBITMQ_PASSWORD:?Set the same RABBITMQ_PASSWORD as the API}@rabbitmq:5672
     healthcheck:
       test:
         - CMD
