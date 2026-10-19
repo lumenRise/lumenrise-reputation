@@ -15,6 +15,7 @@ const scan = {
   _id: scanId,
   identity: identityId,
   address,
+  network: 'testnet',
   sourceUrl: 'https://horizon-testnet.stellar.org',
 } as never;
 

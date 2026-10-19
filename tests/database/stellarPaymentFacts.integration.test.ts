@@ -56,6 +56,7 @@ describe.runIf(Boolean(process.env.LUMENRISE_TEST_DB_URI))('MongoDB Stellar paym
     const scan = await StellarActivityScan.create({
       identity: new mongoose.Types.ObjectId(),
       address,
+      network: 'testnet',
       sourceUrl: 'https://horizon-testnet.stellar.org',
       status: 'running',
       active: true,

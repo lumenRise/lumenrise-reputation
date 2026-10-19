@@ -21,6 +21,7 @@ const createScan = (): StellarActivityScanDocument =>
     identity: new Types.ObjectId(),
     address,
     cursor: '100',
+    network: 'testnet',
     sourceUrl: 'https://horizon-testnet.stellar.org',
     leaseUntil: new Date('2026-09-24T00:00:30Z'),
     pagesProcessed: 1,
@@ -94,10 +95,10 @@ describe('Stellar activity scan worker', () => {
 
     expect(getStellarAccountOperations).toHaveBeenCalledWith(
       address,
+      'testnet',
       '100',
       200,
       'desc',
-      scan.sourceUrl,
     );
     expect(persistStellarPaymentPage).toHaveBeenCalledWith(
       scan,

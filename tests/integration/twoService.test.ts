@@ -60,7 +60,7 @@ test('API and Reputation complete a Stellar scan with or without RabbitMQ', {
     DB_URI: databaseUri,
     DB_NAME: process.env.DB_NAME ?? 'lumenrise_integration_test',
     RABBITMQ_URL: process.env.LUMENRISE_TEST_RABBITMQ_URL,
-    STELLAR_HORIZON_URL: horizonUrl,
+    STELLAR_TESTNET_HORIZON_URL: horizonUrl,
     CREDENTIAL_ENCRYPTION_KEY: '0'.repeat(64),
   };
   const children: ChildProcess[] = [];
