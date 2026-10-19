@@ -23,6 +23,7 @@ vi.mock('../../src/models/SorobanTransactionEvidence', () => ({
 }));
 
 const createCandidate = (attempts = 1) => ({
+  network: 'testnet',
   _id: new Types.ObjectId(),
   scan: new Types.ObjectId(),
   transactionHash: 'a'.repeat(64),

@@ -10,10 +10,10 @@ const processStellarActivityScan = async (scan: StellarActivityScanDocument): Pr
   try {
     const page = await getStellarAccountOperations(
       scan.address,
+      scan.network,
       scan.cursor,
       200,
       'desc',
-      scan.sourceUrl,
     );
 
     if (!page) {

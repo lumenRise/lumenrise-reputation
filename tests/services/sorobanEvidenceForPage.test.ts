@@ -14,6 +14,7 @@ describe('Soroban evidence candidates', () => {
       _id: new Types.ObjectId(),
       identity: new Types.ObjectId(),
       address,
+      network: 'testnet',
       sourceUrl: 'https://horizon-testnet.stellar.org',
     } as StellarActivityScanDocument;
     const other = 'GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF';

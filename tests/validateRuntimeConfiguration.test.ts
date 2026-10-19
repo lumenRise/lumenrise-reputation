@@ -16,7 +16,9 @@ test('rejects invalid worker intervals, URLs, and network settings at startup', 
   assert.throws(() => validate({ ...env, HEALTH_PORT: 0 }), /valid TCP port/);
   assert.throws(() => validate({ ...env, X_AUTO_SYNC_INTERVAL_HOURS: -1 }), /non-negative/);
   assert.throws(() => validate({ ...env, X_AUTO_SYNC_INTERVAL_HOURS: 1 }), /manual only/);
-  assert.throws(() => validate({ ...env, STELLAR_RPC_URL: 'invalid' }), /valid URL/);
-  assert.throws(() => validate({ ...env, STELLAR_AUTH_NETWORK: 'public' }), /does not match/);
+  assert.throws(() => validate({ ...env, STELLAR_TESTNET_RPC_URL: 'invalid' }), /Invalid URL/);
+  assert.throws(() => validate({ ...env,
+        STELLAR_PUBLIC_RPC_URL: 'https://soroban-testnet.stellar.org',
+      }), /does not match/);
   assert.throws(() => validate({ ...env, CREDENTIAL_ENCRYPTION_KEY: 'bad' }), /64-character/);
 });

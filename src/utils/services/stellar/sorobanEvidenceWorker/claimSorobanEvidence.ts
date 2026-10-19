@@ -1,11 +1,18 @@
 import SorobanTransactionEvidence from '../../../../models/SorobanTransactionEvidence';
+import getNetworkConfig from '../../../../services/network/getNetworkConfig';
 
 const LEASE_MS = 60_000;
 
 const claimSorobanEvidence = async () => {
   const now = new Date();
+
+  const networks = (['testnet', 'public'] as const).filter(
+    (network) => getNetworkConfig(network).rpcUrl,
+  );
+
   await SorobanTransactionEvidence.updateMany(
     {
+      network: { $in: networks },
       attempts: { $gte: 3 },
       $or: [
         { rpcStatus: 'queued', scheduledAt: { $lte: now } },
@@ -17,6 +24,7 @@ const claimSorobanEvidence = async () => {
   );
   return SorobanTransactionEvidence.findOneAndUpdate(
     {
+      network: { $in: networks },
       attempts: { $lt: 3 },
       $or: [
         { rpcStatus: 'queued', scheduledAt: { $lte: now } },

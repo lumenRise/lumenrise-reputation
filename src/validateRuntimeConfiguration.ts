@@ -1,5 +1,6 @@
 import type env from './env';
-import parseProviderUrl from './utils/configuration/parseProviderUrl';
+import getNetworkConfig from './services/network/getNetworkConfig';
+import validateNetworkConfiguration from './services/network/validateNetworkConfiguration';
 
 const validateRuntimeConfiguration = (configuration: typeof env): void => {
   if (!Number.isSafeInteger(configuration.SYNC_WORKER_POLL_INTERVAL_MS) ||
@@ -27,16 +28,8 @@ const validateRuntimeConfiguration = (configuration: typeof env): void => {
     throw new Error('CREDENTIAL_ENCRYPTION_KEY must be a 64-character hexadecimal key');
   }
 
-  const production = configuration.NODE_ENV === 'production';
-  const horizon = parseProviderUrl(configuration.STELLAR_HORIZON_URL, 'STELLAR_HORIZON_URL', production);
-  const rpc = parseProviderUrl(configuration.STELLAR_RPC_URL, 'STELLAR_RPC_URL', production);
-  for (const [name, url] of [['STELLAR_HORIZON_URL', horizon], ['STELLAR_RPC_URL', rpc]] as const) {
-    if (url.hostname.endsWith('.stellar.org')) {
-      const isTestnet = url.hostname.includes('testnet');
-      if ((configuration.STELLAR_AUTH_NETWORK === 'testnet') !== isTestnet) {
-        throw new Error(`${name} does not match STELLAR_AUTH_NETWORK`);
-      }
-    }
+  for (const network of ['testnet', 'public'] as const) {
+    validateNetworkConfiguration(getNetworkConfig(network, configuration));
   }
 };
 

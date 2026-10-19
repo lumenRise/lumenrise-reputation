@@ -11,6 +11,7 @@ const claimStellarActivityScan = async (
   const idFilter = scanId ? { _id: new Types.ObjectId(scanId) } : {};
   await StellarActivityScan.updateMany(
     {
+      network: { $in: ['testnet', 'public'] },
       ...idFilter,
       active: true,
       consecutiveFailures: { $gte: 4 },
@@ -25,7 +26,9 @@ const claimStellarActivityScan = async (
   );
   const leaseUntil = new Date(now.getTime() + SCAN_LEASE_MS);
   const queued = await StellarActivityScan.findOneAndUpdate(
-    { ...idFilter, active: true, status: 'queued', scheduledAt: { $lte: now },
+    {
+      network: { $in: ['testnet', 'public'] },
+      ...idFilter, active: true, status: 'queued', scheduledAt: { $lte: now },
       consecutiveFailures: { $lt: 5 } },
     { $set: { status: 'running', leaseUntil } },
     { sort: { scheduledAt: 1 }, runValidators: true, returnDocument: 'after' },
@@ -34,7 +37,9 @@ const claimStellarActivityScan = async (
     return queued;
   }
   return StellarActivityScan.findOneAndUpdate(
-    { ...idFilter, active: true, status: 'running', leaseUntil: { $lte: now },
+    {
+      network: { $in: ['testnet', 'public'] },
+      ...idFilter, active: true, status: 'running', leaseUntil: { $lte: now },
       consecutiveFailures: { $lt: 4 } },
     { $set: { leaseUntil }, $inc: { consecutiveFailures: 1 } },
     { sort: { scheduledAt: 1 }, runValidators: true, returnDocument: 'after' },
