@@ -12,11 +12,14 @@ import { startGitHubSyncWorker } from './workers/githubSync';
 import { startStellarScanWorker } from './workers/stellarScan';
 import { startSorobanEvidenceWorker } from './workers/sorobanEvidence';
 import validateRuntimeConfiguration from './validateRuntimeConfiguration';
+import verifyNetworkProviders from './services/network/verifyNetworkProviders';
 
 const BROKER_RETRY_MS = 5_000;
 
 const main = async (): Promise<void> => {
   validateRuntimeConfiguration(env);
+
+  await Promise.all((['testnet', 'public'] as const).map(verifyNetworkProviders));
   mongoose.set('autoIndex', false);
   await mongoose.connect(env.DB_URI, {
     dbName: env.DB_NAME,

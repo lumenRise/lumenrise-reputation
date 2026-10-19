@@ -36,6 +36,7 @@ const extractStellarPaymentFacts = (
 
     facts.push({
       scan: scan._id,
+      network: scan.network,
       requestedByIdentity: scan.identity,
       address: scan.address,
       counterparty: from === scan.address ? to : from,

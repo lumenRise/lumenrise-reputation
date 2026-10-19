@@ -1,10 +1,10 @@
-import { Networks, rpc, StrKey } from '@stellar/stellar-sdk';
+import { rpc, StrKey } from '@stellar/stellar-sdk';
 
-import env from '../../../../env';
 import logEvent from '../../../../logEvent';
 import claimSorobanEvidence from './claimSorobanEvidence';
 import type { SorobanEventEvidence } from '../../../../types/stellar/soroban';
 import SorobanTransactionEvidence from '../../../../models/SorobanTransactionEvidence';
+import getNetworkConfig from '../../../../services/network/getNetworkConfig';
 
 const MAX_ATTEMPTS = 3;
 
@@ -15,12 +15,12 @@ const processSorobanEvidence = async (): Promise<void> => {
   }
 
   try {
-    const server = new rpc.Server(env.STELLAR_RPC_URL, { timeout: 10_000 });
-    const expectedNetwork =
-      env.STELLAR_AUTH_NETWORK === 'public' ? Networks.PUBLIC : Networks.TESTNET;
+    const configuration = getNetworkConfig(evidence.network);
+    const server = new rpc.Server(configuration.rpcUrl, { timeout: 10_000 });
+    const expectedNetwork = configuration.networkPassphrase;
     const network = await server.getNetwork();
     if (network.passphrase !== expectedNetwork) {
-      throw new Error('Stellar RPC network does not match wallet authentication network');
+      throw new Error('Stellar RPC network does not match the evidence network');
     }
 
     const transaction = await server.getTransaction(evidence.transactionHash);

@@ -31,6 +31,7 @@ const getSorobanEvidenceForPage = (
 
   return [...invocations].map(([transactionHash, invocation]) => ({
     scan: scan._id,
+    network: scan.network,
     requestedByIdentity: scan.identity,
     address: scan.address,
     sourceUrl: scan.sourceUrl,
