@@ -18,6 +18,7 @@ describe.runIf(Boolean(process.env.LUMENRISE_TEST_DB_URI))('expired worker lease
       dbName: databaseName,
       serverSelectionTimeoutMS: 5_000,
     });
+
     await Promise.all([
       IntegrationSyncJob.createIndexes(),
       StellarActivityScan.createIndexes(),
@@ -29,13 +30,16 @@ describe.runIf(Boolean(process.env.LUMENRISE_TEST_DB_URI))('expired worker lease
     if (mongoose.connection.readyState === 1) {
       await mongoose.connection.dropDatabase();
     }
+
     await mongoose.disconnect();
   });
 
   it('fails GitHub and X jobs that crashed on their last permitted attempt', async () => {
     const now = new Date();
+
     for (const provider of ['github', 'x'] as const) {
       const id = new Types.ObjectId();
+
       await IntegrationSyncJob.collection.insertOne({
         _id: id,
         identity: new Types.ObjectId(),
@@ -49,12 +53,18 @@ describe.runIf(Boolean(process.env.LUMENRISE_TEST_DB_URI))('expired worker lease
         leaseUntil: new Date(now.getTime() - 1_000),
         startedAt: new Date(now.getTime() - 60_000),
       });
-      const claimed = provider === 'github'
-        ? await claimGitHubSyncJob(id.toString(), now)
-        : await claimIntegrationSyncJob(id.toString(), now);
+
+      const claimed =
+        provider === 'github'
+          ? await claimGitHubSyncJob(id.toString(), now)
+          : await claimIntegrationSyncJob(id.toString(), now);
+
       expect(claimed).toBeNull();
+
       expect(await IntegrationSyncJob.findById(id)).toMatchObject({
-        status: 'failed', active: false, attempts: 5,
+        status: 'failed',
+        active: false,
+        attempts: 5,
       });
     }
   });
@@ -63,8 +73,10 @@ describe.runIf(Boolean(process.env.LUMENRISE_TEST_DB_URI))('expired worker lease
     const now = new Date();
     const identity = new Types.ObjectId();
     const scanId = new Types.ObjectId();
+
     await StellarActivityScan.collection.insertOne({
       _id: scanId,
+      network: 'testnet',
       identity,
       status: 'running',
       active: true,
@@ -72,21 +84,31 @@ describe.runIf(Boolean(process.env.LUMENRISE_TEST_DB_URI))('expired worker lease
       scheduledAt: new Date(now.getTime() - 60_000),
       leaseUntil: new Date(now.getTime() - 1_000),
     });
+
     expect(await claimStellarActivityScan(scanId.toString(), now)).toBeNull();
-    expect(await StellarActivityScan.findById(scanId)).toMatchObject({ status: 'failed', active: false });
+
+    expect(await StellarActivityScan.findById(scanId)).toMatchObject({
+      status: 'failed',
+      active: false,
+    });
 
     const evidenceId = new Types.ObjectId();
+
     await SorobanTransactionEvidence.collection.insertOne({
       _id: evidenceId,
+      network: 'testnet',
       scan: scanId,
       rpcStatus: 'running',
       attempts: 3,
       scheduledAt: new Date(now.getTime() - 60_000),
       leaseUntil: new Date(now.getTime() - 1_000),
     });
+
     expect(await claimSorobanEvidence()).toBeNull();
+
     expect(await SorobanTransactionEvidence.findById(evidenceId)).toMatchObject({
-      rpcStatus: 'unavailable', attempts: 3,
+      rpcStatus: 'unavailable',
+      attempts: 3,
     });
   });
 });

@@ -10,9 +10,13 @@ import { startHealthServer } from './workers/healthServer';
 import assertRequiredIndexes from './assertRequiredIndexes';
 import { startGitHubSyncWorker } from './workers/githubSync';
 import { startStellarScanWorker } from './workers/stellarScan';
+import ReputationCleanupJob from './models/ReputationCleanupJob';
+import startDomainWorker from './services/messaging/startDomainWorker';
+import startConnectionCleanupWorker from './workers/connectionCleanup';
 import { startSorobanEvidenceWorker } from './workers/sorobanEvidence';
 import validateRuntimeConfiguration from './validateRuntimeConfiguration';
 import verifyNetworkProviders from './services/network/verifyNetworkProviders';
+import handleReputationRequest from './services/messaging/handleReputationRequest';
 
 const BROKER_RETRY_MS = 5_000;
 
@@ -20,7 +24,9 @@ const main = async (): Promise<void> => {
   validateRuntimeConfiguration(env);
 
   await Promise.all((['testnet', 'public'] as const).map(verifyNetworkProviders));
+
   mongoose.set('autoIndex', false);
+
   await mongoose.connect(env.DB_URI, {
     dbName: env.DB_NAME,
     serverSelectionTimeoutMS: 5_000,
@@ -28,9 +34,13 @@ const main = async (): Promise<void> => {
 
   try {
     await assertRequiredIndexes();
+
+    await ReputationCleanupJob.createIndexes();
+
     logEvent('info', 'mongodb_connected', { database: env.DB_NAME });
   } catch (error) {
     await mongoose.disconnect();
+
     throw error;
   }
 
@@ -48,6 +58,7 @@ const main = async (): Promise<void> => {
 
     retryTimer = setTimeout(() => {
       retryTimer = null;
+
       void connectBroker();
     }, BROKER_RETRY_MS);
   };
@@ -67,9 +78,11 @@ const main = async (): Promise<void> => {
 
         connection = connected;
 
-        connected.on('error', (error) => logEvent('error', 'rabbitmq_connection_error', {
-          errorName: error instanceof Error ? error.name : 'UnknownError',
-        }));
+        connected.on('error', (error) =>
+          logEvent('error', 'rabbitmq_connection_error', {
+            errorName: error instanceof Error ? error.name : 'UnknownError',
+          }),
+        );
 
         connected.on('close', () => {
           if (broker === connected) {
@@ -85,9 +98,7 @@ const main = async (): Promise<void> => {
 
         broker = connected;
 
-        await Promise.all(
-          queueWorkers.map((worker) => worker.attachBroker(connected)),
-        );
+        await Promise.all(queueWorkers.map((worker) => worker.attachBroker(connected)));
 
         logEvent('info', 'rabbitmq_consumers_connected');
       } catch (error) {
@@ -111,21 +122,28 @@ const main = async (): Promise<void> => {
   };
 
   try {
-    queueWorkers.push(
-      await startGitHubSyncWorker(null, env.SYNC_WORKER_POLL_INTERVAL_MS),
+    workers.push(
+      await startDomainWorker('reputation', handleReputationRequest, (error: unknown): void => {
+        logEvent('error', 'reputation_request_worker_failed', {
+          errorName: error instanceof Error ? error.message : 'UnknownError',
+        });
+      }),
     );
 
-    queueWorkers.push(
-      await startXSyncWorker(null, env.SYNC_WORKER_POLL_INTERVAL_MS),
-    );
+    queueWorkers.push(await startConnectionCleanupWorker(null));
 
-    queueWorkers.push(
-      await startStellarScanWorker(null, env.SYNC_WORKER_POLL_INTERVAL_MS),
-    );
+    queueWorkers.push(await startGitHubSyncWorker(null, env.SYNC_WORKER_POLL_INTERVAL_MS));
+
+    queueWorkers.push(await startXSyncWorker(null, env.SYNC_WORKER_POLL_INTERVAL_MS));
+
+    queueWorkers.push(await startStellarScanWorker(null, env.SYNC_WORKER_POLL_INTERVAL_MS));
 
     workers.push(...queueWorkers);
+
     workers.push(startSorobanEvidenceWorker(env.SYNC_WORKER_POLL_INTERVAL_MS));
+
     workers.push(startRetentionWorker());
+
     workers.push(await startHealthServer(env.HEALTH_PORT, () => broker !== null));
 
     logEvent('info', 'readiness_server_started', { port: env.HEALTH_PORT });
@@ -133,10 +151,12 @@ const main = async (): Promise<void> => {
     await Promise.allSettled(workers.reverse().map((worker) => worker.stop()));
 
     await mongoose.disconnect();
+
     throw error;
   }
 
   logEvent('info', 'mongodb_polling_started');
+
   void connectBroker();
 
   const shutdown = async (): Promise<void> => {
@@ -155,9 +175,7 @@ const main = async (): Promise<void> => {
     try {
       await connecting;
 
-      await Promise.allSettled(
-        workers.reverse().map((worker) => worker.stop()),
-      );
+      await Promise.allSettled(workers.reverse().map((worker) => worker.stop()));
 
       await broker?.close().catch(() => {});
 
@@ -174,6 +192,7 @@ const main = async (): Promise<void> => {
   };
 
   process.once('SIGINT', () => void shutdown());
+
   process.once('SIGTERM', () => void shutdown());
 };
 
@@ -182,9 +201,7 @@ void main().catch((error: unknown) => {
     errorName: error instanceof Error ? error.name : 'UnknownError',
     reason:
       error instanceof Error &&
-      /^(SYNC_|X_AUTO_|GITHUB_|X_CLIENT_|CREDENTIAL_|STELLAR_|HEALTH_)/.test(
-        error.message,
-      )
+      /^(SYNC_|X_AUTO_|GITHUB_|X_CLIENT_|CREDENTIAL_|STELLAR_|HEALTH_)/.test(error.message)
         ? error.message
         : null,
   });
