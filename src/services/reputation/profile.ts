@@ -1,0 +1,48 @@
+import type { Types } from 'mongoose';
+
+import Identity from '../../models/Identity';
+import StellarAccount from '../../models/StellarAccount';
+import getCurrentReputationSnapshot from './currentSnapshot';
+import StellarActivityScan from '../../models/StellarActivityScan';
+import type { StellarNetwork } from '../../types/network/configuration';
+import type { ReputationProfileResult } from '../../types/reputation/profile';
+import toStellarReputationResult from '../../utils/reputation/toStellarReputationResult';
+import toReputationSnapshotResult from '../../utils/reputation/toReputationSnapshotResult';
+
+const getReputationProfile = async (
+  identityId: Types.ObjectId,
+  network: StellarNetwork,
+): Promise<ReputationProfileResult | null> => {
+  const [identity, wallet, developerSnapshot, socialSnapshot] = await Promise.all([
+    Identity.findById(identityId),
+    StellarAccount.findOne({ identity: identityId, isPrimary: true, disconnectedAt: null }),
+    getCurrentReputationSnapshot(identityId, 'developer'),
+    getCurrentReputationSnapshot(identityId, 'social'),
+  ]);
+
+  if (!identity) {
+    return null;
+  }
+
+  const scan = wallet
+    ? await StellarActivityScan.findOne({
+        identity: identityId,
+        address: wallet.address,
+        network,
+      }).sort({ createdAt: -1 })
+    : null;
+
+  return {
+    identity: {
+      id: identity._id.toString(),
+      name: identity.name,
+      avatarUrl: identity.avatarUrl ?? null,
+      primaryWalletAddress: wallet?.address ?? null,
+    },
+    developer: developerSnapshot ? toReputationSnapshotResult(developerSnapshot) : null,
+    social: socialSnapshot ? toReputationSnapshotResult(socialSnapshot) : null,
+    stellar: wallet ? toStellarReputationResult(wallet.address, scan) : null,
+  };
+};
+
+export default getReputationProfile;
