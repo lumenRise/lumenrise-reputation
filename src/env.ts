@@ -56,17 +56,11 @@ const schema = defineConfig({
   STELLAR_TESTNET_HORIZON_URL: {
     default: 'https://horizon-testnet.stellar.org',
   },
-  LAUNCH_TESTNET_FACTORY_CONTRACT_ID: {
-    default: '',
-  },
   STELLAR_PUBLIC_RPC_URL: {
     default: '',
   },
   STELLAR_PUBLIC_HORIZON_URL: {
     default: 'https://horizon.stellar.org',
-  },
-  LAUNCH_PUBLIC_FACTORY_CONTRACT_ID: {
-    default: '',
   },
 });
 

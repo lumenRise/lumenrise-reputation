@@ -12,20 +12,25 @@ beforeEach((): void => {
     rpcUrl: 'https://soroban-testnet.stellar.org',
     horizonUrl: 'https://horizon-testnet.stellar.org',
     networkPassphrase: Networks.PUBLIC,
-    factoryContractId: '',
   });
 });
 
 afterEach((): void => {
   vi.restoreAllMocks();
+
   vi.unstubAllGlobals();
 });
 
 describe('provider startup checks', () => {
   it('accepts a different reported network while checking connectivity', async (): Promise<void> => {
-    const fetchProvider = vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      network_passphrase: Networks.TESTNET,
-    })));
+    const fetchProvider = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          network_passphrase: Networks.TESTNET,
+        }),
+      ),
+    );
+
     const getNetwork = vi.spyOn(rpc.Server.prototype, 'getNetwork').mockResolvedValue({
       passphrase: Networks.TESTNET,
       protocolVersion: '23',
@@ -35,18 +40,25 @@ describe('provider startup checks', () => {
 
     await expect(verifyNetworkProviders('public')).resolves.toBeUndefined();
 
-    expect(fetchProvider).toHaveBeenCalledWith('https://horizon-testnet.stellar.org', expect.any(Object));
+    expect(fetchProvider).toHaveBeenCalledWith(
+      'https://horizon-testnet.stellar.org',
+      expect.any(Object),
+    );
+
     expect(getNetwork).toHaveBeenCalledOnce();
   });
 
   it('still rejects unsuccessful Horizon responses', async (): Promise<void> => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { status: 503 })));
 
-    await expect(verifyNetworkProviders('public')).rejects.toThrow('Unable to verify public Horizon');
+    await expect(verifyNetworkProviders('public')).rejects.toThrow(
+      'Unable to verify public Horizon',
+    );
   });
 
   it('still propagates RPC connectivity failures', async (): Promise<void> => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('{}')));
+
     vi.spyOn(rpc.Server.prototype, 'getNetwork').mockRejectedValue(new Error('RPC unavailable'));
 
     await expect(verifyNetworkProviders('public')).rejects.toThrow('RPC unavailable');

@@ -5,7 +5,6 @@ interface NetworkConfiguration {
   rpcUrl: string;
   horizonUrl: string;
   networkPassphrase: string;
-  factoryContractId: string;
 }
 
 export type { StellarNetwork, NetworkConfiguration };
