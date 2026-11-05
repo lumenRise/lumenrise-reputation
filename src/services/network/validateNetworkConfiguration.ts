@@ -1,9 +1,7 @@
-import { StrKey } from '@stellar/stellar-sdk';
-
 import type { NetworkConfiguration } from '../../types/network/configuration';
 
 const validateNetworkConfiguration = (configuration: Readonly<NetworkConfiguration>): void => {
-  const { network, horizonUrl, rpcUrl, factoryContractId } = configuration;
+  const { network, horizonUrl, rpcUrl } = configuration;
 
   for (const value of [horizonUrl, rpcUrl]) {
     if (!value) {
@@ -25,13 +23,6 @@ const validateNetworkConfiguration = (configuration: Readonly<NetworkConfigurati
 
   if (!horizonUrl) {
     throw new Error(`Horizon URL is required for ${network}`);
-  }
-
-  if (
-    factoryContractId &&
-    (!rpcUrl || !StrKey.isValidContract(factoryContractId))
-  ) {
-    throw new Error(`Factory and RPC must be configured together for ${network}`);
   }
 };
 
